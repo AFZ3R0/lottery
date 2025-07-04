@@ -344,13 +344,106 @@ function createCard(user, isBold, id, showTable) {
     element.style.backgroundColor =
       "rgba(0,127,127," + (Math.random() * 0.7 + 0.25) + ")";
   }
-  //添加公司标识
-  element.appendChild(createElement("company", COMPANY));
-
-  element.appendChild(createElement("name", user[1]));
-
-  element.appendChild(createElement("details", user[0] + "<br/>" + user[2]));
+  
+  // 只显示姓名和部门
+  var nameElement = createElement("name", user[1]);
+  var deptElement = createElement("department", user[2]);
+  
+  // 添加文字缩放功能
+  adjustTextSize(nameElement, "name");
+  adjustTextSize(deptElement, "department");
+  
+  element.appendChild(nameElement);
+  element.appendChild(deptElement);
+  
   return element;
+}
+
+/**
+ * 调整文字大小以适应卡片
+ */
+function adjustTextSize(element, className) {
+  const maxWidth = 7; // 卡片宽度限制 (vh) - 为边距留出更多空间
+  const maxHeight = className === "name" ? 4.5 : 2.5; // 卡片高度限制 (vh) - 为边距留出更多空间
+  
+  // 获取文字内容
+  const text = element.textContent;
+  
+  // 处理换行逻辑 - 只在空格处换行
+  const processedText = processTextWrap(text, className);
+  element.innerHTML = processedText;
+  
+  // 根据文字长度计算合适的字体大小
+  let fontSize = className === "name" ? 2.9 : 1.6; // 默认字体大小（最大字体）
+  
+  // 计算中文字符数量（中文字符占用更多空间）
+  const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const englishChars = text.length - chineseChars;
+  const effectiveLength = chineseChars * 1.5 + englishChars;
+  
+  // 只有当文字长度超过阈值时才进行缩放
+  const nameThreshold = 6; // 姓名超过6个字符才开始缩放
+  const deptThreshold = 8; // 部门超过8个字符才开始缩放
+  const threshold = className === "name" ? nameThreshold : deptThreshold;
+  
+  if (effectiveLength > threshold) {
+    // 文字过长时缩小字体，但不超过原始字体大小
+    const scale = Math.min(maxWidth / effectiveLength, maxHeight / 2);
+    fontSize = Math.max(fontSize * scale, 1.0); // 最小字体大小
+    fontSize = Math.min(fontSize, className === "name" ? 2.9 : 1.6); // 不超过原始字体大小
+  }
+  
+  element.style.fontSize = fontSize + "vh";
+  
+  // 使用flexbox布局，不需要设置行高
+  // element.style.lineHeight = maxHeight + "vh";
+}
+
+/**
+ * 处理文字换行，只在空格处换行
+ */
+function processTextWrap(text, className) {
+  // 根据元素类型设置最大字符数
+  const maxCharsPerLine = className === "name" ? 5 : 7; // 减少字符数，为边距留出空间
+  
+  // 如果没有空格，检查是否需要强制换行
+  if (!text.includes(' ')) {
+    if (text.length > maxCharsPerLine) {
+      // 对于没有空格的长文字，在适当位置强制换行
+      const midPoint = Math.ceil(text.length / 2);
+      return text.substring(0, midPoint) + '<br>' + text.substring(midPoint);
+    }
+    return text;
+  }
+  
+  // 分割文字为单词
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+  
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    
+    // 如果当前行加上新单词不超过限制，就添加到当前行
+    if ((currentLine + ' ' + word).length <= maxCharsPerLine) {
+      currentLine = currentLine ? currentLine + ' ' + word : word;
+    } else {
+      // 如果当前行不为空，先保存当前行
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+      // 开始新行
+      currentLine = word;
+    }
+  }
+  
+  // 添加最后一行
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  
+  // 将多行文字用<br>连接
+  return lines.join('<br>');
 }
 
 function removeHighlight() {
@@ -435,8 +528,10 @@ function rotateBall() {
         },
         ROTATE_TIME * ROTATE_LOOP
       )
+      //.easing(TWEEN.Easing.Cubic.Out)  // 指数减速：前面快、后面慢
+      //.easing(TWEEN.Easing.Linear)
       .onUpdate(render)
-      // .easing(TWEEN.Easing.Linear)
+      
       .start()
       .onStop(() => {
         scene.rotation.y = 0;
@@ -707,9 +802,17 @@ function random(num) {
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
 
-  card.innerHTML = `<div class="company">${COMPANY}</div><div class="name">${
-    user[1]
-  }</div><div class="details">${user[0] || ""}<br/>${user[2] || "PSST"}</div>`;
+  // 只显示姓名和部门
+  var nameElement = createElement("name", user[1]);
+  var deptElement = createElement("department", user[2]);
+  
+  // 添加文字缩放功能
+  adjustTextSize(nameElement, "name");
+  adjustTextSize(deptElement, "department");
+  
+  card.innerHTML = "";
+  card.appendChild(nameElement);
+  card.appendChild(deptElement);
 }
 
 /**
@@ -745,7 +848,7 @@ function shineCard() {
       shine(cardIndex);
       changeCard(cardIndex, basicData.leftUsers[index]);
     }
-  }, 500);
+  }, 30);
 }
 
 function setData(type, data) {

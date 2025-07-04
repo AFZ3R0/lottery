@@ -49,6 +49,10 @@ npm install
 cd ../product
 npm install
 
+# 只在当前 PowerShell 会话生效 // Ze Add
+$Env:NODE_OPTIONS = "--openssl-legacy-provider"
+
+
 # Package
 npm run build
 

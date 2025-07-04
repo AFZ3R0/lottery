@@ -70,33 +70,54 @@ a {
   border: 1px solid rgba(127, 255, 255, 0.75);
 }
 
-.element .company {
-  position: absolute;
-  top: 1.2vh;
-  right: 0;
-  width: 100%;
-  font-size: 2vh;
-  color: rgba(127, 255, 255, 0.75);
-}
-
 .element .name {
   position: absolute;
-  top: 4.6vh;
-  left: 0;
-  right: 0;
+  top: 2.5vh;
+  left: 1vh;
+  right: 1vh;
   font-size: 2.9vh;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.75);
   text-shadow: 0 0 1vh rgba(0, 255, 255, 0.95);
+  text-align: center;
+  word-wrap: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow: visible;
+  max-width: 10vh;
+  max-height: 6vh;
+  padding: 0.5vh;
+  box-sizing: border-box;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
-.element .details {
+.element .department {
   position: absolute;
-  bottom: 1.2vh;
-  left: 0;
-  right: 0;
+  bottom: 1.5vh;
+  left: 1vh;
+  right: 1vh;
   font-size: 1.6vh;
   color: rgba(127, 255, 255, 0.75);
+  text-align: center;
+  word-wrap: break-word;
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow: visible;
+  max-width: 10vh;
+  max-height: 4vh;
+  padding: 0.5vh;
+  box-sizing: border-box;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 button {
@@ -140,12 +161,10 @@ button:active {
   box-shadow: 0 0 12px rgba(253, 105, 0, 0.95);
 }
 
-.prize .company,
-.prize .details,
 .prize .name,
-.highlight .company,
+.prize .department,
 .highlight .name,
-.highlight .details {
+.highlight .department {
   color: rgba(255, 255, 255, 0.85);
 }
 
