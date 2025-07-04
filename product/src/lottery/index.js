@@ -26,7 +26,7 @@ let TOTAL_CARDS,
   COLUMN_COUNT = 17,
   COMPANY,
   HIGHLIGHT_CELL = [],
-  // 当前的比例
+  // 目前比例
   Resolution = 1;
 
 let camera,
@@ -44,16 +44,16 @@ let rotateObj;
 let selectedCardIndex = [],
   rotate = false,
   basicData = {
-    prizes: [], //奖品信息
-    users: [], //所有人员
-    luckyUsers: {}, //已中奖人员
-    leftUsers: [] //未中奖人员
+    prizes: [], //獎品信息
+    users: [], //所有人員
+    luckyUsers: {}, //已中獎人員
+    leftUsers: [] //未中獎人員
   },
   interval,
-  // 当前抽的奖项，从最低奖开始抽，直到抽到大奖
+  // 目前抽的獎項，從最低獎開始抽，直到抽到大獎
   currentPrizeIndex,
   currentPrize,
-  // 正在抽奖
+  // 正在抽獎
   isLotting = false,
   currentLuckys = [];
 
@@ -66,7 +66,7 @@ function initAll() {
   window.AJAX({
     url: "/getTempData",
     success(data) {
-      // 获取基础数据
+      // 獲取基礎資料
       prizes = data.cfgData.prizes;
       EACH_COUNT = data.cfgData.EACH_COUNT;
       COMPANY = data.cfgData.COMPANY;
@@ -76,7 +76,7 @@ function initAll() {
 
       TOTAL_CARDS = ROW_COUNT * COLUMN_COUNT;
 
-      // 读取当前已设置的抽奖结果
+      // 讀取目前已設置的抽獎結果
       basicData.leftUsers = data.leftUsers;
       basicData.luckyUsers = data.luckyData;
 
@@ -203,49 +203,48 @@ function setLotteryStatus(status = false) {
 }
 
 /**
- * 事件绑定
+ * 事件綁定
  */
 function bindEvent() {
   document.querySelector("#menu").addEventListener("click", function (e) {
     e.stopPropagation();
-    // 如果正在抽奖，则禁止一切操作
+    // 如果正在抽獎，則禁止一切操作
     if (isLotting) {
       if (e.target.id === "lottery") {
         rotateObj.stop();
-        btns.lottery.innerHTML = "开始抽奖";
+        btns.lottery.innerHTML = "開始抽獎";
       } else {
-        addQipao("正在抽奖，抽慢一点点～～");
+        addQipao("正在抽獎，抽慢一點點～～");
       }
       return false;
     }
 
     let target = e.target.id;
     switch (target) {
-      // 显示数字墙
+      // 顯示數字牆
       case "welcome":
         switchScreen("enter");
         rotate = false;
         break;
-      // 进入抽奖
+      // 進入抽獎
       case "enter":
         removeHighlight();
-        addQipao(`马上抽取[${currentPrize.title}],不要走开。`);
-        // rotate = !rotate;
+        addQipao(`即將抽取[${currentPrize && currentPrize.title ? currentPrize.title : ''}]，請勿離開。`);
         rotate = true;
         switchScreen("lottery");
         break;
       // 重置
       case "reset":
         let doREset = window.confirm(
-          "是否确认重置数据，重置后，当前已抽的奖项全部清空？"
+          "是否確認重置資料，重置後，當前已抽的獎項全部清空？"
         );
         if (!doREset) {
           return;
         }
-        addQipao("重置所有数据，重新抽奖");
+        addQipao("重置所有資料，重新抽獎");
         addHighlight();
         resetCard();
-        // 重置所有数据
+        // Reset all data
         currentLuckys = [];
         basicData.leftUsers = Object.assign([], basicData.users);
         basicData.luckyUsers = {};
@@ -256,44 +255,38 @@ function bindEvent() {
         reset();
         switchScreen("enter");
         break;
-      // 抽奖
+      // 抽獎
       case "lottery":
         setLotteryStatus(true);
-        // 每次抽奖前先保存上一次的抽奖数据
         saveData();
-        //更新剩余抽奖数目的数据显示
         changePrize();
         resetCard().then(res => {
-          // 抽奖
           lottery();
         });
-        addQipao(`正在抽取[${currentPrize.title}],调整好姿势`);
+        addQipao(`正在抽取[${currentPrize && currentPrize.title ? currentPrize.title : ''}]，請準備！`);
         break;
-      // 重新抽奖
+      // 重新抽獎
       case "reLottery":
         if (currentLuckys.length === 0) {
-          addQipao(`当前还没有抽奖，无法重新抽取喔~~`);
+          addQipao(`目前尚未抽獎，無法重新抽取。`);
           return;
         }
         setErrorData(currentLuckys);
-        addQipao(`重新抽取[${currentPrize.title}],做好准备`);
+        addQipao(`重新抽取[${currentPrize && currentPrize.title ? currentPrize.title : ''}]，請準備！`);
         setLotteryStatus(true);
-        // 重新抽奖则直接进行抽取，不对上一次的抽奖数据进行保存
-        // 抽奖
         resetCard().then(res => {
-          // 抽奖
           lottery();
         });
         break;
-      // 导出抽奖结果
+      // 導出抽獎結果
       case "save":
         saveData().then(res => {
           resetCard().then(res => {
-            // 将之前的记录置空
+            // Clear previous records
             currentLuckys = [];
           });
           exportData();
-          addQipao(`数据已保存到EXCEL中。`);
+          addQipao(`資料已匯出至EXCEL。`);
         });
         break;
     }
@@ -318,7 +311,7 @@ function switchScreen(type) {
 }
 
 /**
- * 创建元素
+ * 創建元素
  */
 function createElement(css, text) {
   let dom = document.createElement("div");
@@ -328,7 +321,7 @@ function createElement(css, text) {
 }
 
 /**
- * 创建名牌
+ * 創建名牌
  */
 function createCard(user, isBold, id, showTable) {
   var element = createElement();
@@ -345,11 +338,11 @@ function createCard(user, isBold, id, showTable) {
       "rgba(0,127,127," + (Math.random() * 0.7 + 0.25) + ")";
   }
   
-  // 只显示姓名和部门
+  // 只顯示姓名和部門
   var nameElement = createElement("name", user[1]);
   var deptElement = createElement("department", user[2]);
   
-  // 添加文字缩放功能
+  // 添加文字縮放功能
   adjustTextSize(nameElement, "name");
   adjustTextSize(deptElement, "department");
   
@@ -360,63 +353,63 @@ function createCard(user, isBold, id, showTable) {
 }
 
 /**
- * 调整文字大小以适应卡片
+ * 調整文字大小以適應卡片
  */
 function adjustTextSize(element, className) {
-  const maxWidth = 7; // 卡片宽度限制 (vh) - 为边距留出更多空间
-  const maxHeight = className === "name" ? 4.5 : 2.5; // 卡片高度限制 (vh) - 为边距留出更多空间
+  const maxWidth = 7; // 卡片寬度限制 (vh) - 為邊距留出更多空間
+  const maxHeight = className === "name" ? 4.5 : 2.5; // 卡片高度限制 (vh) - 為邊距留出更多空間
   
-  // 获取文字内容
+  // 獲取文字內容
   const text = element.textContent;
   
-  // 处理换行逻辑 - 只在空格处换行
+  // 處理換行邏輯 - 只在空格處換行
   const processedText = processTextWrap(text, className);
   element.innerHTML = processedText;
   
-  // 根据文字长度计算合适的字体大小
-  let fontSize = className === "name" ? 2.9 : 1.6; // 默认字体大小（最大字体）
+  // 根據文字長度計算合適的字體大小
+  let fontSize = className === "name" ? 2.9 : 1.6; // 默認字體大小（最大字體）
   
-  // 计算中文字符数量（中文字符占用更多空间）
+  // 計算中文字符數量（中文字符占用更多空間）
   const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
   const englishChars = text.length - chineseChars;
   const effectiveLength = chineseChars * 1.5 + englishChars;
   
-  // 只有当文字长度超过阈值时才进行缩放
-  const nameThreshold = 6; // 姓名超过6个字符才开始缩放
-  const deptThreshold = 8; // 部门超过8个字符才开始缩放
+  // 只有當文字長度超過閾值時才進行縮放
+  const nameThreshold = 6; // 姓名超過6個字符才開始縮放
+  const deptThreshold = 8; // 部門超過8個字符才開始縮放
   const threshold = className === "name" ? nameThreshold : deptThreshold;
   
   if (effectiveLength > threshold) {
-    // 文字过长时缩小字体，但不超过原始字体大小
+    // 文字過長時縮小字體，但不超過原始字體大小
     const scale = Math.min(maxWidth / effectiveLength, maxHeight / 2);
-    fontSize = Math.max(fontSize * scale, 1.0); // 最小字体大小
-    fontSize = Math.min(fontSize, className === "name" ? 2.9 : 1.6); // 不超过原始字体大小
+    fontSize = Math.max(fontSize * scale, 1.0); // 最小字體大小
+    fontSize = Math.min(fontSize, className === "name" ? 2.9 : 1.6); // 不超過原始字體大小
   }
   
   element.style.fontSize = fontSize + "vh";
   
-  // 使用flexbox布局，不需要设置行高
+  // 使用flexbox布局，不需要設置行高
   // element.style.lineHeight = maxHeight + "vh";
 }
 
 /**
- * 处理文字换行，只在空格处换行
+ * 處理文字換行，只在空格處換行
  */
 function processTextWrap(text, className) {
-  // 根据元素类型设置最大字符数
-  const maxCharsPerLine = className === "name" ? 5 : 7; // 减少字符数，为边距留出空间
+  // 根據元素類型設置最大字符數
+  const maxCharsPerLine = className === "name" ? 5 : 7; // 減少字符數，為邊距留出空間
   
-  // 如果没有空格，检查是否需要强制换行
+  // 如果没有空格，檢查是否需要強制換行
   if (!text.includes(' ')) {
     if (text.length > maxCharsPerLine) {
-      // 对于没有空格的长文字，在适当位置强制换行
+      // 對於沒有空格的長文字，在適當位置強制換行
       const midPoint = Math.ceil(text.length / 2);
       return text.substring(0, midPoint) + '<br>' + text.substring(midPoint);
     }
     return text;
   }
   
-  // 分割文字为单词
+  // 分割文字為單詞
   const words = text.split(' ');
   const lines = [];
   let currentLine = '';
@@ -424,25 +417,25 @@ function processTextWrap(text, className) {
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
     
-    // 如果当前行加上新单词不超过限制，就添加到当前行
+    // 如果當前行加上新單詞不超過限制，就添加到當前行
     if ((currentLine + ' ' + word).length <= maxCharsPerLine) {
       currentLine = currentLine ? currentLine + ' ' + word : word;
     } else {
-      // 如果当前行不为空，先保存当前行
+      // 如果當前行不為空，先保存當前行
       if (currentLine) {
         lines.push(currentLine);
       }
-      // 开始新行
+      // 開始新行
       currentLine = word;
     }
   }
   
-  // 添加最后一行
+  // 添加最後一行
   if (currentLine) {
     lines.push(currentLine);
   }
   
-  // 将多行文字用<br>连接
+  // 將多行文字用<br>連接
   return lines.join('<br>');
 }
 
@@ -528,7 +521,7 @@ function rotateBall() {
         },
         ROTATE_TIME * ROTATE_LOOP
       )
-      //.easing(TWEEN.Easing.Cubic.Out)  // 指数减速：前面快、后面慢
+      //.easing(TWEEN.Easing.Cubic.Out)  // 指數減速：前面快、後面慢
       //.easing(TWEEN.Easing.Linear)
       .onUpdate(render)
       
@@ -551,14 +544,14 @@ function onWindowResize() {
 }
 
 function animate() {
-  // 让场景通过x轴或者y轴旋转
+  // 讓場景通過x軸或者y軸旋轉
   // rotate && (scene.rotation.y += 0.088);
 
   requestAnimationFrame(animate);
   TWEEN.update();
   controls.update();
 
-  // 渲染循环
+  // 渲染循環
   // render();
 }
 
@@ -572,7 +565,7 @@ function selectCard(duration = 600) {
     tag = -(currentLuckys.length - 1) / 2,
     locates = [];
 
-  // 计算位置信息, 大于5个分两排显示
+  // 計算位置信息, 大於5個分兩排顯示
   if (currentLuckys.length > 5) {
     let yPosition = [-87, 87],
       l = selectedCardIndex.length,
@@ -606,7 +599,7 @@ function selectCard(duration = 600) {
 
   let text = currentLuckys.map(item => item[1]);
   addQipao(
-    `恭喜${text.join("、")}获得${currentPrize.title}, 新的一年必定旺旺旺。`
+    `恭喜${text.join("、")}獲得${currentPrize && currentPrize.title ? currentPrize.title : ''}，新的一年必定旺旺旺！`
   );
 
   selectedCardIndex.forEach((cardIndex, index) => {
@@ -645,13 +638,13 @@ function selectCard(duration = 600) {
     .onUpdate(render)
     .start()
     .onComplete(() => {
-      // 动画结束后可以操作
+      // 動畫結束後可以操作
       setLotteryStatus();
     });
 }
 
 /**
- * 重置抽奖牌内容
+ * 重置抽獎牌內容
  */
 function resetCard(duration = 500) {
   if (currentLuckys.length === 0) {
@@ -703,27 +696,27 @@ function resetCard(duration = 500) {
 }
 
 /**
- * 抽奖
+ * 抽獎
  */
 function lottery() {
   // if (isLotting) {
   //   rotateObj.stop();
-  //   btns.lottery.innerHTML = "开始抽奖";
+  //   btns.lottery.innerHTML = "開始抽獎";
   //   return;
   // }
-  btns.lottery.innerHTML = "结束抽奖";
+  btns.lottery.innerHTML = "結束抽獎";
   rotateBall().then(() => {
-    // 将之前的记录置空
+    // Clear previous records
     currentLuckys = [];
     selectedCardIndex = [];
-    // 当前同时抽取的数目,当前奖品抽完还可以继续抽，但是不记录数据
+    // 目前同時抽取的數目,目前獎品抽完還可以繼續抽，但是不記錄數據
     let perCount = EACH_COUNT[currentPrizeIndex],
       luckyData = basicData.luckyUsers[currentPrize.type],
       leftCount = basicData.leftUsers.length,
       leftPrizeCount = currentPrize.count - (luckyData ? luckyData.length : 0);
 
     if (leftCount < perCount) {
-      addQipao("剩余参与抽奖人员不足，现在重新设置所有人员可以进行二次抽奖！");
+      addQipao("剩餘參與抽獎人員不足，現已重設所有人員可進行二次抽獎！");
       basicData.leftUsers = basicData.users.slice();
       leftCount = basicData.leftUsers.length;
     }
@@ -751,11 +744,11 @@ function lottery() {
 }
 
 /**
- * 保存上一次的抽奖结果
+ * 保存上一次的抽獎結果
  */
 function saveData() {
   if (!currentPrize) {
-    //若奖品抽完，则不再记录数据，但是还是可以进行抽奖
+    //若獎品抽完，則不再記錄數據，但是還是可以進行抽獎
     return;
   }
 
@@ -775,7 +768,7 @@ function saveData() {
   }
 
   if (currentLuckys.length > 0) {
-    // todo by xc 添加数据保存机制，以免服务器挂掉数据丢失
+    // todo by xc 添加數據保存機制，以免伺服器掛掉數據丢失
     return setData(type, currentLuckys);
   }
   return Promise.resolve();
@@ -784,29 +777,29 @@ function saveData() {
 function changePrize() {
   let luckys = basicData.luckyUsers[currentPrize.type];
   let luckyCount = (luckys ? luckys.length : 0) + EACH_COUNT[currentPrizeIndex];
-  // 修改左侧prize的数目和百分比
+  // 修改左側prize的數目和百分比
   setPrizeData(currentPrizeIndex, luckyCount);
 }
 
 /**
- * 随机抽奖
+ * 隨機抽獎
  */
 function random(num) {
-  // Math.floor取到0-num-1之间数字的概率是相等的
+  // Math.floor取到0-num-1之間數字的概率是相等的
   return Math.floor(Math.random() * num);
 }
 
 /**
- * 切换名牌人员信息
+ * 切換名牌人員信息
  */
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
 
-  // 只显示姓名和部门
+  // 只顯示姓名和部門
   var nameElement = createElement("name", user[1]);
   var deptElement = createElement("department", user[2]);
   
-  // 添加文字缩放功能
+  // 添加文字縮放功能
   adjustTextSize(nameElement, "name");
   adjustTextSize(deptElement, "department");
   
@@ -816,7 +809,7 @@ function changeCard(cardIndex, user) {
 }
 
 /**
- * 切换名牌背景
+ * 切換名牌背景
  */
 function shine(cardIndex, color) {
   let card = threeDCards[cardIndex].element;
@@ -825,7 +818,7 @@ function shine(cardIndex, color) {
 }
 
 /**
- * 随机切换背景和人员信息
+ * 隨機切換背景和人員信息
  */
 function shineCard() {
   let maxCard = 10,
@@ -833,7 +826,7 @@ function shineCard() {
   let shineCard = 10 + random(maxCard);
 
   setInterval(() => {
-    // 正在抽奖停止闪烁
+    // 正在抽獎停止閃爍
     if (isLotting) {
       return;
     }
@@ -841,7 +834,7 @@ function shineCard() {
     for (let i = 0; i < shineCard; i++) {
       let index = random(maxUser),
         cardIndex = random(TOTAL_CARDS);
-      // 当前显示的已抽中名单不进行随机切换
+      // 目前顯示的已抽中名單不進行隨機切換
       if (selectedCardIndex.includes(cardIndex)) {
         continue;
       }
@@ -958,7 +951,7 @@ window.onload = function () {
             animate();
           },
           () => {
-            addQipao("背景音乐自动播放失败，请手动播放！");
+            addQipao("背景音樂自動播放失敗，請手動播放！");
           }
         );
       } else {
@@ -973,3 +966,44 @@ window.onload = function () {
     musicBox.click();
   }, 1000);
 };
+
+// Custom cursor (semi-transparent dot)
+(function() {
+  // Inject CSS
+  const style = document.createElement('style');
+  style.innerHTML = `
+    body { cursor: none !important; }
+    #custom-cursor {
+      position: fixed;
+      left: 0; top: 0;
+      width: 36px; height: 36px;
+      margin-left: -18px; margin-top: -18px;
+      pointer-events: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      box-shadow: 0 0 8px 2px rgba(255,255,255,0.10);
+      z-index: 9999;
+      transition: background 0.2s, transform 0.1s;
+      will-change: transform;
+      display: none;
+    }
+    @media (pointer: coarse) {
+      body { cursor: auto !important; }
+      #custom-cursor { display: none !important; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  const cursor = document.getElementById('custom-cursor');
+  if (!cursor) return;
+
+  // Show/hide on mouse enter/leave
+  document.body.addEventListener('mouseenter', () => { cursor.style.display = 'block'; });
+  document.body.addEventListener('mouseleave', () => { cursor.style.display = 'none'; });
+
+  // 跟隨滑鼠移動
+  document.addEventListener('mousemove', function(e) {
+    cursor.style.display = 'block';
+    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  });
+})();
