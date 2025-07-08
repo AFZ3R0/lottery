@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>抽獎系統配色預覽</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f9fa; color: #222; }
+    h1 { font-size: 1.5em; margin-bottom: 1em; }
+    .palette { display: flex; flex-wrap: wrap; gap: 24px; }
+    .color-block {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .color-label {
+      text-align: center;
+      font-size: 0.95em;
+      margin-top: 0.5em;
+      color: #333;
+      word-break: break-all;
+    }
+    .color-code {
+      font-size: 0.9em;
+      color: #666;
+      background: rgba(255,255,255,0.7);
+      border-radius: 4px;
+      padding: 2px 6px;
+      position: absolute;
+      left: 8px;
+      top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>抽獎系統主要配色預覽</h1>
+  <div class="palette">
+    <div>
+      <div class="color-block" style="background: #fff; border:1px solid #eee;">
+        <span class="color-code">#fff</span>
+      </div>
+      <div class="color-label">主背景色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #f8f9fa; border:1px solid #eee;">
+        <span class="color-code">#f8f9fa</span>
+      </div>
+      <div class="color-label">次背景色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(0,127,127,0.7);">
+        <span class="color-code">rgba(0,127,127,0.7)</span>
+      </div>
+      <div class="color-label">卡片底色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #FFD700;">
+        <span class="color-code">#FFD700</span>
+      </div>
+      <div class="color-label">高亮卡片（金色）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #d9534f;">
+        <span class="color-code">#d9534f</span>
+      </div>
+      <div class="color-label">進度條（紅）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #007bff;">
+        <span class="color-code">#007bff</span>
+      </div>
+      <div class="color-label">主按鈕（藍）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #17a2b8;">
+        <span class="color-code">#17a2b8</span>
+      </div>
+      <div class="color-label">高亮按鈕（青）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #222; color: #fff;">
+        <span class="color-code">#222</span>
+      </div>
+      <div class="color-label">主文字色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #333; color: #fff;">
+        <span class="color-code">#333</span>
+      </div>
+      <div class="color-label">次文字色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #000; color: #fff;">
+        <span class="color-code">#000</span>
+      </div>
+      <div class="color-label">黑色文字</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(255,255,255,0.18); border:1px solid #eee;">
+        <span class="color-code">rgba(255,255,255,0.18)</span>
+      </div>
+      <div class="color-label">自訂游標圓點</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(255,255,255,0.10); border:1px solid #eee;">
+        <span class="color-code">rgba(255,255,255,0.10)</span>
+      </div>
+      <div class="color-label">游標陰影</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(253, 105, 0, 0.95);">
+        <span class="color-code">rgba(253,105,0,0.95)</span>
+      </div>
+      <div class="color-label">卡片高亮（橙）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(253, 105, 0, 0.85);">
+        <span class="color-code">rgba(253,105,0,0.85)</span>
+      </div>
+      <div class="color-label">卡片高亮（橙，淡）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(253, 105, 0, 0.9);">
+        <span class="color-code">rgba(253,105,0,0.9)</span>
+      </div>
+      <div class="color-label">卡片高亮（橙，進階）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #131313; color: #fff;">
+        <span class="color-code">#131313</span>
+      </div>
+      <div class="color-label">主背景（深灰黑）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #02101c; color: #fff;">
+        <span class="color-code">#02101c</span>
+      </div>
+      <div class="color-label">主背景（深藍黑）</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(0,255,255,0.5);">
+        <span class="color-code">rgba(0,255,255,0.5)</span>
+      </div>
+      <div class="color-label">卡片陰影/按鈕hover</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(0,255,255,0.75);">
+        <span class="color-code">rgba(0,255,255,0.75)</span>
+      </div>
+      <div class="color-label">卡片邊框/按鈕active</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(127,255,255,0.25);">
+        <span class="color-code">rgba(127,255,255,0.25)</span>
+      </div>
+      <div class="color-label">卡片邊框淡色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(127,255,255,0.75);">
+        <span class="color-code">rgba(127,255,255,0.75)</span>
+      </div>
+      <div class="color-label">卡片文字/按鈕文字</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(255,255,255,0.75); border:1px solid #eee;">
+        <span class="color-code">rgba(255,255,255,0.75)</span>
+      </div>
+      <div class="color-label">卡片主文字</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(0,127,127,0.37);">
+        <span class="color-code">rgba(0,127,127,0.37)</span>
+      </div>
+      <div class="color-label">卡片/彈幕底色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #03e9f4;">
+        <span class="color-code">#03e9f4</span>
+      </div>
+      <div class="color-label">高亮動畫邊框</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: #db5c58;">
+        <span class="color-code">#db5c58</span>
+      </div>
+      <div class="color-label">prize-shine 文字</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(0,0,0,0.5); color: #fff;">
+        <span class="color-code">rgba(0,0,0,0.5)</span>
+      </div>
+      <div class="color-label">進度條背景/遮罩</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(255,255,255,0.15); border:1px solid #eee;">
+        <span class="color-code">rgba(255,255,255,0.15)</span>
+      </div>
+      <div class="color-label">進度條條紋</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(127,255,255,0.25);">
+        <span class="color-code">rgba(127,255,255,0.25)</span>
+      </div>
+      <div class="color-label">氣泡底色</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(127,255,255,0.75);">
+        <span class="color-code">rgba(127,255,255,0.75)</span>
+      </div>
+      <div class="color-label">氣泡文字</div>
+    </div>
+    <div>
+      <div class="color-block" style="background: rgba(253,105,0,0.9);">
+        <span class="color-code">rgba(253,105,0,0.9)</span>
+      </div>
+      <div class="color-label">音樂按鈕底色</div>
+    </div>
+  </div>
+</body>
+</html> 
