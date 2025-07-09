@@ -1010,3 +1010,16 @@ window.onload = function () {
     cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
   });
 })();
+
+// 主題色自動載入
+(function() {
+  const colorVars = [
+    '--card-bg', '--card-border', '--glow-cyan', '--text-primary',
+    '--text-secondary', '--text-accent', '--glow-orange',
+    '--border-cyan', '--border-orange'
+  ];
+  colorVars.forEach(v => {
+    const val = localStorage.getItem(v);
+    if (val) document.documentElement.style.setProperty(v, val);
+  });
+})();

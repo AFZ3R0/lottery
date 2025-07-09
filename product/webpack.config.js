@@ -69,6 +69,10 @@ module.exports = {
       {
         from: "./src/lib",
         to: "./lib"
+      },
+      {
+        from: "./src/theme.html",
+        to: "./theme.html"
       }
     ])
   ]
