@@ -63,6 +63,14 @@
     }
   }
 
+  // 新增：載入背景圖片
+  var bgImg = new Image();
+  bgImg.src = './img/bg.jpeg';
+  var bgLoaded = false;
+  bgImg.onload = function() {
+    bgLoaded = true;
+  };
+
   function drawStars() {
     var pixelX, pixelY, pixelRadius;
 
@@ -75,10 +83,43 @@
       canvas.height = window.innerHeight;
       initializeStars();
     }
-    if (warp == 0) {
-      c.fillStyle = "rgba(0,10,20,1)";
+
+    // 先畫模糊背景圖
+    if (bgLoaded) {
+      c.save();
+      c.filter = 'blur(8px)'; // 可調整模糊程度
+      // 讓圖片寬度自動，高度等於canvas
+      var imgRatio = bgImg.width / bgImg.height;
+      var canvasRatio = canvas.width / canvas.height;
+      var drawWidth, drawHeight, drawX, drawY;
+      if (imgRatio > canvasRatio) {
+        // 圖片比canvas寬
+        drawHeight = canvas.height;
+        drawWidth = bgImg.width * (canvas.height / bgImg.height);
+        drawX = (canvas.width - drawWidth) / 2;
+        drawY = 0;
+      } else {
+        // 圖片比canvas窄
+        drawWidth = canvas.width;
+        drawHeight = bgImg.height * (canvas.width / bgImg.width);
+        drawX = 0;
+        drawY = (canvas.height - drawHeight) / 2;
+      }
+      c.drawImage(bgImg, drawX, drawY, drawWidth, drawHeight);
+      c.restore();
+      c.filter = 'none';
+
+      // 新增：調暗圖片
+      c.save();
+      c.globalAlpha = 0.5; // 0~1，數值越大越暗
+      c.fillStyle = '#000';
       c.fillRect(0, 0, canvas.width, canvas.height);
+      c.restore();
+    } else {
+      // 沒有圖片時用透明
+      c.clearRect(0, 0, canvas.width, canvas.height);
     }
+
     c.fillStyle = "rgba(209, 255, 255, " + radius + ")";
     for (i = 0; i < numStars; i++) {
       star = stars[i];
