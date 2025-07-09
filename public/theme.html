@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>主題色彩調整 Theme Editor</title>
+  <style>
+    body {
+      background: #222;
+      color: #fff;
+      font-family: Helvetica, Arial, sans-serif;
+      padding: 2em;
+    }
+    .theme-group {
+      margin-bottom: 2em;
+      padding: 1em;
+      background: #333;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px #0006;
+    }
+    .theme-group h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: #0ff;
+    }
+    .color-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1em;
+    }
+    .color-row label {
+      width: 180px;
+      margin-right: 1em;
+      font-size: 1em;
+    }
+    .color-row input[type="color"] {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: none;
+      margin-right: 1em;
+      cursor: pointer;
+    }
+    .color-row input[type="range"] {
+      width: 120px;
+      margin-right: 1em;
+    }
+    .color-row .value {
+      min-width: 90px;
+      font-family: monospace;
+    }
+    .btns {
+      margin-top: 2em;
+    }
+    button {
+      font-size: 1em;
+      padding: 0.5em 1.5em;
+      margin-right: 1em;
+      border-radius: 4px;
+      border: none;
+      background: #0ff;
+      color: #222;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #fff;
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>主題色彩調整 Theme Editor</h1>
+  <form id="themeForm">
+    <div class="theme-group">
+      <h2>卡片</h2>
+      <div class="color-row">
+        <label for="card-bg">卡片底色</label>
+        <input type="color" id="card-bg">
+        <span class="value" id="val-card-bg"></span>
+      </div>
+      <div class="color-row">
+        <label for="card-border">卡片邊框</label>
+        <input type="color" id="card-border">
+        <span class="value" id="val-card-border"></span>
+      </div>
+      <div class="color-row">
+        <label for="card-glow">卡片光暈</label>
+        <input type="color" id="card-glow">
+        <span class="value" id="val-card-glow"></span>
+      </div>
+    </div>
+    <div class="theme-group">
+      <h2>文字</h2>
+      <div class="color-row">
+        <label for="text-primary">主文字</label>
+        <input type="color" id="text-primary">
+        <span class="value" id="val-text-primary"></span>
+      </div>
+      <div class="color-row">
+        <label for="text-secondary">次要文字</label>
+        <input type="color" id="text-secondary">
+        <span class="value" id="val-text-secondary"></span>
+      </div>
+      <div class="color-row">
+        <label for="text-accent">強調文字</label>
+        <input type="color" id="text-accent">
+        <span class="value" id="val-text-accent"></span>
+      </div>
+    </div>
+    <div class="theme-group">
+      <h2>光暈/強調</h2>
+      <div class="color-row">
+        <label for="glow-cyan">主光暈色</label>
+        <input type="color" id="glow-cyan">
+        <span class="value" id="val-glow-cyan"></span>
+      </div>
+      <div class="color-row">
+        <label for="glow-orange">橙色光暈</label>
+        <input type="color" id="glow-orange">
+        <span class="value" id="val-glow-orange"></span>
+      </div>
+    </div>
+    <div class="theme-group">
+      <h2>邊框</h2>
+      <div class="color-row">
+        <label for="border-cyan">主邊框色</label>
+        <input type="color" id="border-cyan">
+        <span class="value" id="val-border-cyan"></span>
+      </div>
+      <div class="color-row">
+        <label for="border-orange">橙色邊框</label>
+        <input type="color" id="border-orange">
+        <span class="value" id="val-border-orange"></span>
+      </div>
+    </div>
+    <div class="btns">
+      <button type="button" onclick="saveTheme()">儲存主題</button>
+      <button type="button" onclick="resetTheme()">重置預設</button>
+    </div>
+  </form>
+  <script>
+    // 變數對應
+    const colorVars = [
+      { id: 'card-bg', var: '--card-bg' },
+      { id: 'card-border', var: '--card-border' },
+      { id: 'card-glow', var: '--glow-cyan' },
+      { id: 'text-primary', var: '--text-primary' },
+      { id: 'text-secondary', var: '--text-secondary' },
+      { id: 'text-accent', var: '--text-accent' },
+      { id: 'glow-cyan', var: '--glow-cyan' },
+      { id: 'glow-orange', var: '--glow-orange' },
+      { id: 'border-cyan', var: '--border-cyan' },
+      { id: 'border-orange', var: '--border-orange' },
+    ];
+    // 取得目前CSS變數值
+    function getVar(v) {
+      return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+    }
+    // HEX/RGBA 轉 HEX
+    function toHex(color) {
+      let ctx = document.createElement('canvas').getContext('2d');
+      ctx.fillStyle = color;
+      return ctx.fillStyle;
+    }
+    // 初始化顏色選擇器
+    function initTheme() {
+      colorVars.forEach(({id, var: v}) => {
+        let val = localStorage.getItem(v) || getVar(v);
+        if(val.startsWith('rgba') || val.startsWith('rgb')) {
+          // 只取前3個分量
+          let rgb = val.match(/\d+/g);
+          val = '#' + rgb.slice(0,3).map(x=>('0'+parseInt(x).toString(16)).slice(-2)).join('');
+        }
+        document.getElementById(id).value = toHex(val);
+        document.getElementById('val-'+id).textContent = val;
+      });
+    }
+    // 即時預覽
+    document.getElementById('themeForm').addEventListener('input', e => {
+      colorVars.forEach(({id, var: v}) => {
+        let val = document.getElementById(id).value;
+        document.documentElement.style.setProperty(v, val);
+        document.getElementById('val-'+id).textContent = val;
+      });
+    });
+    // 儲存主題
+    function saveTheme() {
+      colorVars.forEach(({id, var: v}) => {
+        let val = document.getElementById(id).value;
+        localStorage.setItem(v, val);
+      });
+      alert('主題已儲存！請重新整理主頁面查看效果。');
+    }
+    // 重置預設
+    function resetTheme() {
+      colorVars.forEach(({id, var: v}) => {
+        localStorage.removeItem(v);
+      });
+      location.reload();
+    }
+    // 載入時初始化
+    initTheme();
+  </script>
+</body>
+</html> 
