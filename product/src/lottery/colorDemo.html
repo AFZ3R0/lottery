@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽獎系統顏色變量演示</title>
+    <link rel="stylesheet" href="./colors.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: var(--cyan-medium);
+            text-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .color-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid var(--cyan-light);
+            border-radius: 8px;
+            background-color: var(--black-overlay);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .color-item {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--cyan-light);
+            text-align: center;
+            position: relative;
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 2px solid var(--white-border);
+        }
+
+        .color-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .color-value {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .theme-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--cyan-medium);
+            background: transparent;
+            color: var(--cyan-medium);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover {
+            background-color: var(--cyan-primary);
+            color: var(--black-primary);
+        }
+
+        .theme-btn.active {
+            background-color: var(--orange-primary);
+            color: var(--white-primary);
+            border-color: var(--orange-primary);
+        }
+
+        .demo-elements {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .demo-element {
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .demo-button {
+            padding: 10px 20px;
+            border: 1px solid var(--cyan-medium);
+            background: transparent;
+            color: var(--cyan-medium);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-button:hover {
+            background-color: var(--cyan-primary);
+            color: var(--black-primary);
+        }
+
+        .demo-button:active {
+            background-color: var(--cyan-secondary);
+        }
+
+        .demo-highlight {
+            background-color: var(--orange-primary);
+            box-shadow: 0 0 12px var(--orange-primary);
+            border: 1px solid var(--orange-border);
+            color: var(--text-tertiary);
+        }
+
+        .demo-progress {
+            width: 100%;
+            height: 20px;
+            background: var(--black-overlay);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .demo-progress-bar {
+            height: 100%;
+            background-color: var(--progress-bg);
+            width: 60%;
+            transition: width 0.3s ease;
+        }
+
+        .demo-shine {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--shine-color));
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .code-block {
+            background-color: var(--black-overlay);
+            border: 1px solid var(--cyan-light);
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+            overflow-x: auto;
+        }
+
+        .usage-examples {
+            margin: 30px 0;
+        }
+
+        .example-item {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--cyan-medium);
+            background-color: var(--black-overlay);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>抽獎系統顏色變量演示</h1>
+        
+        <div class="color-section">
+            <h2>主題切換</h2>
+            <div class="theme-buttons">
+                <button class="theme-btn active" onclick="switchTheme('default')">默認主題</button>
+                <button class="theme-btn" onclick="switchTheme('purple')">紫色奢華主題</button>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h2>主要顏色變量</h2>
+            <div class="color-grid">
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--bg-primary)"></div>
+                    <div class="color-name">背景主色</div>
+                    <div class="color-value">--bg-primary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--bg-secondary)"></div>
+                    <div class="color-name">背景次色</div>
+                    <div class="color-value">--bg-secondary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--text-primary)"></div>
+                    <div class="color-name">主要文字</div>
+                    <div class="color-value">--text-primary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--text-secondary)"></div>
+                    <div class="color-name">次要文字</div>
+                    <div class="color-value">--text-secondary</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h2>青色系顏色</h2>
+            <div class="color-grid">
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--cyan-primary)"></div>
+                    <div class="color-name">青色主色</div>
+                    <div class="color-value">--cyan-primary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--cyan-secondary)"></div>
+                    <div class="color-name">青色次色</div>
+                    <div class="color-value">--cyan-secondary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--cyan-light)"></div>
+                    <div class="color-name">淺青色</div>
+                    <div class="color-value">--cyan-light</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--cyan-medium)"></div>
+                    <div class="color-name">中青色</div>
+                    <div class="color-value">--cyan-medium</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--cyan-dark)"></div>
+                    <div class="color-name">深青色</div>
+                    <div class="color-value">--cyan-dark</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--cyan-glow)"></div>
+                    <div class="color-name">青色光暈</div>
+                    <div class="color-value">--cyan-glow</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h2>橙色系顏色</h2>
+            <div class="color-grid">
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--orange-primary)"></div>
+                    <div class="color-name">橙色主色</div>
+                    <div class="color-value">--orange-primary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--orange-secondary)"></div>
+                    <div class="color-name">橙色次色</div>
+                    <div class="color-value">--orange-secondary</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--orange-text)"></div>
+                    <div class="color-name">橙色文字</div>
+                    <div class="color-value">--orange-text</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--orange-border)"></div>
+                    <div class="color-name">橙色邊框</div>
+                    <div class="color-value">--orange-border</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h2>其他顏色</h2>
+            <div class="color-grid">
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--progress-bg)"></div>
+                    <div class="color-name">進度條背景</div>
+                    <div class="color-value">--progress-bg</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--shine-color)"></div>
+                    <div class="color-name">閃光效果</div>
+                    <div class="color-value">--shine-color</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--black-overlay)"></div>
+                    <div class="color-name">黑色遮罩</div>
+                    <div class="color-value">--black-overlay</div>
+                </div>
+                <div class="color-item">
+                    <div class="color-preview" style="background: var(--white-overlay)"></div>
+                    <div class="color-name">白色遮罩</div>
+                    <div class="color-value">--white-overlay</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h2>元素演示</h2>
+            <div class="demo-elements">
+                <div class="demo-element">
+                    <button class="demo-button">普通按鈕</button>
+                </div>
+                <div class="demo-element">
+                    <button class="demo-button demo-highlight">高亮按鈕</button>
+                </div>
+                <div class="demo-element">
+                    <button class="demo-button demo-shine">閃光按鈕</button>
+                </div>
+                <div class="demo-element">
+                    <div class="demo-progress">
+                        <div class="demo-progress-bar"></div>
+                    </div>
+                    <div>進度條</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h2>使用方式</h2>
+            <div class="usage-examples">
+                <div class="example-item">
+                    <h3>CSS 中使用</h3>
+                    <div class="code-block">
+.my-element {
+    background-color: var(--cyan-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--cyan-light);
+    box-shadow: 0 0 10px var(--cyan-glow);
+}
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <h3>JavaScript 中使用 ColorUtils</h3>
+                    <div class="code-block">
+// 獲取顏色值
+const primaryColor = ColorUtils.getCSSVariable('--cyan-primary');
+
+// 設置顏色值
+ColorUtils.setCSSVariable('--cyan-primary', 'rgba(0, 255, 255, 0.6)');
+
+// 生成卡片背景色
+const cardBg = ColorUtils.generateCardBackground(0, 127, 127);
+
+// 切換主題
+ColorUtils.setColorTheme(ColorUtils.themes.purple);
+                    </div>
+                </div>
+
+                <div class="example-item">
+                    <h3>動態修改顏色</h3>
+                    <div class="code-block">
+// 修改單個顏色變量
+document.documentElement.style.setProperty('--cyan-primary', 'rgba(0, 255, 255, 0.8)');
+
+// 批量修改主題
+const newTheme = {
+    bgPrimary: '#1a0b2e',
+    cyanPrimary: 'rgba(147, 51, 234, 0.5)',
+    // ... 其他顏色
+};
+ColorUtils.setColorTheme(newTheme);
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./colorUtils.js"></script>
+    <script>
+        function switchTheme(themeName) {
+            // 更新按鈕狀態
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 切換主題
+            if (ColorUtils && ColorUtils.themes[themeName]) {
+                ColorUtils.setColorTheme(ColorUtils.themes[themeName]);
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('顏色系統已加載');
+            console.log('當前主題:', ColorUtils.getColorTheme());
+        });
+    </script>
+</body>
+</html> 

@@ -602,6 +602,9 @@ function selectCard(duration = 600) {
     `恭喜${text.join("、")}獲得${currentPrize && currentPrize.title ? currentPrize.title : ''}，新的一年必定旺旺旺！`
   );
 
+  // 根據得獎個數決定Z值
+  const zValue = currentLuckys.length > 1 ? 2350 : 2500;
+  
   selectedCardIndex.forEach((cardIndex, index) => {
     changeCard(cardIndex, currentLuckys[index]);
     var object = threeDCards[cardIndex];
@@ -610,7 +613,7 @@ function selectCard(duration = 600) {
         {
           x: locates[index].x,
           y: locates[index].y * Resolution,
-          z: 2200
+          z: zValue
         },
         Math.random() * duration + duration
       )
