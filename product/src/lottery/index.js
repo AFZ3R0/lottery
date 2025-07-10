@@ -334,8 +334,9 @@ function createCard(user, isBold, id, showTable) {
     }
   } else {
     element.className = "element";
-    element.style.backgroundColor =
-      "rgba(0,127,127," + (Math.random() * 0.7 + 0.25) + ")";
+    // 改為讀取 CSS 變數 --card-bg
+    const cardBg = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim() || 'rgba(0,127,127,0.7)';
+    element.style.backgroundColor = cardBg;
   }
   
   // 只顯示姓名和部門
@@ -816,8 +817,40 @@ function changeCard(cardIndex, user) {
  */
 function shine(cardIndex, color) {
   let card = threeDCards[cardIndex].element;
-  card.style.backgroundColor =
-    color || "rgba(0,127,127," + (Math.random() * 0.7 + 0.25) + ")";
+  // 取得主題色 --shine-color，解析 RGB
+  let shineColor = getComputedStyle(document.documentElement).getPropertyValue('--shine-color').trim() || 'rgba(0,127,127,0.7)';
+  let rgba = shineColor;
+  if (!color) {
+    // 解析 rgb/rgba/hex
+    let r=0,g=127,b=127,a=1;
+    if (shineColor.startsWith('rgba')) {
+      const match = shineColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
+      if (match) {
+        r = parseInt(match[1]);
+        g = parseInt(match[2]);
+        b = parseInt(match[3]);
+        a = match[4] ? parseFloat(match[4]) : 1;
+      }
+    } else if (shineColor.startsWith('rgb')) {
+      const match = shineColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if (match) {
+        r = parseInt(match[1]);
+        g = parseInt(match[2]);
+        b = parseInt(match[3]);
+      }
+    } else if (shineColor.startsWith('#')) {
+      const hex = shineColor.replace('#','');
+      if (hex.length === 6) {
+        r = parseInt(hex.substr(0,2),16);
+        g = parseInt(hex.substr(2,2),16);
+        b = parseInt(hex.substr(4,2),16);
+      }
+    }
+    // 隨機 alpha
+    const randomAlpha = Math.random() * 0.7 + 0.25;
+    rgba = `rgba(${r},${g},${b},${randomAlpha})`;
+  }
+  card.style.backgroundColor = color || rgba;
 }
 
 /**
@@ -974,6 +1007,9 @@ window.onload = function () {
 (function() {
   // Inject CSS
   const style = document.createElement('style');
+  // 改為讀取 CSS 變數 --cursor-bg, --cursor-shadow
+  const cursorBg = getComputedStyle(document.documentElement).getPropertyValue('--cursor-bg').trim() || 'rgba(255,255,255,0.18)';
+  const cursorShadow = getComputedStyle(document.documentElement).getPropertyValue('--cursor-shadow').trim() || 'rgba(255,255,255,0.10)';
   style.innerHTML = `
     body { cursor: none !important; }
     #custom-cursor {
@@ -983,8 +1019,8 @@ window.onload = function () {
       margin-left: -18px; margin-top: -18px;
       pointer-events: none;
       border-radius: 50%;
-      background: rgba(255,255,255,0.18);
-      box-shadow: 0 0 8px 2px rgba(255,255,255,0.10);
+      background: ${cursorBg};
+      box-shadow: 0 0 8px 2px ${cursorShadow};
       z-index: 9999;
       transition: background 0.2s, transform 0.1s;
       will-change: transform;

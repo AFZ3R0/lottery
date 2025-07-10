@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>抽獎系統主題色彩編輯器</title>
   <style>
-    body { 
+    body {
       font-family: Arial, sans-serif; 
       background: linear-gradient(135deg, #131313 0%, #02101c 100%);
-      color: #fff; 
+      color: #fff;
       margin: 0;
       padding: 20px;
     }
@@ -17,10 +17,26 @@
       text-align: center;
       color: #0ff;
       text-shadow: 0 0 10px rgba(0,255,255,0.5);
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 1001;
+      position: relative;
+    }
+    .h1-hidden {
+      opacity: 0;
+      transform: translateY(-40px);
+      pointer-events: none;
     }
     .controls {
       text-align: center;
       margin-bottom: 2em;
+      position: sticky;
+      top: 0;
+      background: rgba(19,19,19,0.95);
+      z-index: 1000;
+      padding: 16px 0 10px 0;
+      box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+      border-bottom: 1px solid rgba(0,255,255,0.08);
+      transition: box-shadow 0.2s;
     }
     .btn {
       background: rgba(0,255,255,0.3);
@@ -178,7 +194,7 @@
   </style>
 </head>
 <body>
-  <h1>抽獎系統主題色彩編輯器</h1>
+  <h1 id="main-title">抽獎系統主題色彩編輯器</h1>
   
   <div class="controls">
     <button class="btn" onclick="saveTheme()">💾 儲存主題</button>
@@ -186,7 +202,7 @@
     <button class="btn" onclick="resetToDefault()">🔄 還原預設</button>
     <button class="btn" onclick="exportTheme()">📤 匯出設定</button>
     <button class="btn" onclick="importTheme()">📥 匯入設定</button>
-  </div>
+      </div>
 
   <div class="palette" id="palette"></div>
   
@@ -224,7 +240,13 @@
       'progress-stripe': { label: '進度條條紋', color: '#ffffff', alpha: 0.15 },
       'bubble-bg': { label: '氣泡底色', color: '#7fffff', alpha: 0.25 },
       'bubble-text': { label: '氣泡文字', color: '#7fffff', alpha: 0.75 },
-      'music-btn': { label: '音樂按鈕底色', color: '#fd6900', alpha: 0.9 }
+      'music-btn': { label: '音樂按鈕底色', color: '#fd6900', alpha: 0.9 },
+      // 新增卡片閃爍高亮色
+      'shine-color': { label: '卡片閃爍高亮色', color: '#03e9f4', alpha: 1 },
+      // 新增自訂游標底色
+      'cursor-bg': { label: '游標底色', color: '#ffffff', alpha: 0.18 },
+      // 新增自訂游標陰影
+      'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 }
     };
 
     let currentColors = JSON.parse(JSON.stringify(defaultColors));
@@ -408,7 +430,23 @@
     function loadTheme() {
       const saved = localStorage.getItem('lotteryTheme');
       if (saved) {
-        currentColors = JSON.parse(saved);
+        // 合併 defaultColors，保證所有 key 都存在
+        const loaded = JSON.parse(saved);
+        currentColors = {};
+        Object.keys(defaultColors).forEach(key => {
+          if (loaded[key]) {
+            // 若有 label 變動也用新版
+            currentColors[key] = {
+              label: defaultColors[key].label,
+              color: loaded[key].color,
+              alpha: loaded[key].alpha
+            };
+          } else {
+            currentColors[key] = JSON.parse(JSON.stringify(defaultColors[key]));
+          }
+        });
+      } else {
+        currentColors = JSON.parse(JSON.stringify(defaultColors));
       }
       renderPalette();
       showStatus('主題已載入！');
@@ -446,7 +484,19 @@
           reader.onload = (e) => {
             try {
               const imported = JSON.parse(e.target.result);
-              currentColors = imported;
+              // 合併 defaultColors，保證所有 key 都存在
+              currentColors = {};
+              Object.keys(defaultColors).forEach(key => {
+                if (imported[key]) {
+                  currentColors[key] = {
+                    label: defaultColors[key].label,
+                    color: imported[key].color,
+                    alpha: imported[key].alpha
+                  };
+                } else {
+                  currentColors[key] = JSON.parse(JSON.stringify(defaultColors[key]));
+                }
+              });
               renderPalette();
               showStatus('設定已匯入！');
             } catch (error) {
@@ -472,6 +522,16 @@
 
     // 初始化
     renderPalette();
+
+    // 標題滾動隱藏
+    window.addEventListener('scroll', function() {
+      const h1 = document.getElementById('main-title');
+      if (window.scrollY > 40) {
+        h1.classList.add('h1-hidden');
+      } else {
+        h1.classList.remove('h1-hidden');
+      }
+    });
   </script>
 </body>
 </html> 
