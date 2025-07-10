@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>抽獎系統主題色彩編輯器</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background: linear-gradient(135deg, #131313 0%, #02101c 100%);
+      color: #fff; 
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { 
+      font-size: 2em; 
+      margin-bottom: 1em; 
+      text-align: center;
+      color: #0ff;
+      text-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+    .controls {
+      text-align: center;
+      margin-bottom: 2em;
+    }
+    .btn {
+      background: rgba(0,255,255,0.3);
+      color: #fff;
+      border: 1px solid rgba(127,255,255,0.5);
+      padding: 10px 20px;
+      margin: 0 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: rgba(0,255,255,0.5);
+      box-shadow: 0 0 10px rgba(0,255,255,0.3);
+    }
+    .palette { 
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px; 
+      max-width: 1400px;
+      margin: 0 auto;
+      justify-content: flex-start;
+    }
+    .color-item {
+      background: rgba(0,127,127,0.2);
+      border: 1px solid rgba(127,255,255,0.3);
+      border-radius: 10px;
+      padding: 15px;
+      width: 400px;
+      min-height: 120px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+    .color-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.3);
+      margin-right: 18px;
+      margin-top: 8px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .color-preview input[type="color"] {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+    .color-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .color-label {
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: rgba(127,255,255,0.9);
+      text-align: left;
+    }
+    .color-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      align-items: stretch;
+    }
+    .color-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      justify-content: flex-start;
+      margin-bottom: 2px;
+    }
+    .color-input label {
+      width: 32px;
+      font-size: 13px;
+      color: #0ff;
+      text-align: right;
+      margin-right: 4px;
+    }
+    .color-input input[type="range"] {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      outline: none;
+      max-width: 120px;
+    }
+    .color-input input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #0ff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .color-value {
+      font-family: monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.3);
+      padding: 4px 8px;
+      border-radius: 4px;
+      min-width: 120px;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .reset-btn {
+      background: rgba(253,105,0,0.3);
+      color: #fff;
+      border: 1px solid rgba(253,105,0,0.5);
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      margin-top: 8px;
+      width: 60px;
+      align-self: flex-end;
+    }
+    .reset-btn:hover {
+      background: rgba(253,105,0,0.5);
+    }
+    .status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,255,0,0.8);
+      color: #000;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    input[type="color"].hidden-picker {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>抽獎系統主題色彩編輯器</h1>
+  
+  <div class="controls">
+    <button class="btn" onclick="saveTheme()">💾 儲存主題</button>
+    <button class="btn" onclick="loadTheme()">📂 載入主題</button>
+    <button class="btn" onclick="resetToDefault()">🔄 還原預設</button>
+    <button class="btn" onclick="exportTheme()">📤 匯出設定</button>
+    <button class="btn" onclick="importTheme()">📥 匯入設定</button>
+  </div>
+
+  <div class="palette" id="palette"></div>
+  
+  <div class="status" id="status"></div>
+
+  <script>
+    // 預設顏色配置（從color-palette-preview.html解析）
+    const defaultColors = {
+      'main-bg': { label: '主背景色', color: '#ffffff', alpha: 1 },
+      'sub-bg': { label: '次背景色', color: '#f8f9fa', alpha: 1 },
+      'card-bg': { label: '卡片底色', color: '#007f7f', alpha: 0.7 },
+      'card-gold': { label: '高亮卡片（金色）', color: '#FFD700', alpha: 1 },
+      'progress-red': { label: '進度條（紅）', color: '#d9534f', alpha: 1 },
+      'btn-blue': { label: '主按鈕（藍）', color: '#007bff', alpha: 1 },
+      'btn-cyan': { label: '高亮按鈕（青）', color: '#17a2b8', alpha: 1 },
+      'text-main': { label: '主文字色', color: '#222222', alpha: 1 },
+      'text-sub': { label: '次文字色', color: '#333333', alpha: 1 },
+      'text-black': { label: '黑色文字', color: '#000000', alpha: 1 },
+      'cursor-dot': { label: '自訂游標圓點', color: '#ffffff', alpha: 0.18 },
+      'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 },
+      'card-orange': { label: '卡片高亮（橙）', color: '#fd6900', alpha: 0.95 },
+      'card-orange-light': { label: '卡片高亮（橙，淡）', color: '#fd6900', alpha: 0.85 },
+      'card-orange-adv': { label: '卡片高亮（橙，進階）', color: '#fd6900', alpha: 0.9 },
+      'bg-dark': { label: '主背景（深灰黑）', color: '#131313', alpha: 1 },
+      'bg-darkblue': { label: '主背景（深藍黑）', color: '#02101c', alpha: 1 },
+      'shadow-cyan': { label: '卡片陰影/按鈕hover', color: '#00ffff', alpha: 0.5 },
+      'border-cyan': { label: '卡片邊框/按鈕active', color: '#00ffff', alpha: 0.75 },
+      'border-cyan-light': { label: '卡片邊框淡色', color: '#7fffff', alpha: 0.25 },
+      'text-cyan': { label: '卡片文字/按鈕文字', color: '#7fffff', alpha: 0.75 },
+      'text-main-card': { label: '卡片主文字', color: '#ffffff', alpha: 0.75 },
+      'card-danmu-bg': { label: '卡片/彈幕底色', color: '#007f7f', alpha: 0.37 },
+      'border-anim': { label: '高亮動畫邊框', color: '#03e9f4', alpha: 1 },
+      'prize-shine': { label: 'prize-shine 文字', color: '#db5c58', alpha: 1 },
+      'progress-mask': { label: '進度條背景/遮罩', color: '#000000', alpha: 0.5 },
+      'progress-stripe': { label: '進度條條紋', color: '#ffffff', alpha: 0.15 },
+      'bubble-bg': { label: '氣泡底色', color: '#7fffff', alpha: 0.25 },
+      'bubble-text': { label: '氣泡文字', color: '#7fffff', alpha: 0.75 },
+      'music-btn': { label: '音樂按鈕底色', color: '#fd6900', alpha: 0.9 }
+    };
+
+    let currentColors = JSON.parse(JSON.stringify(defaultColors));
+
+    // 解析顏色為RGB和Alpha
+    function parseColor(colorStr) {
+      if (colorStr.startsWith('#')) {
+        const hex = colorStr.substring(1);
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        return { r, g, b, alpha: 1 };
+      } else if (colorStr.startsWith('rgba')) {
+        const match = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
+        if (match) {
+          return {
+            r: parseInt(match[1]),
+            g: parseInt(match[2]),
+            b: parseInt(match[3]),
+            alpha: match[4] ? parseFloat(match[4]) : 1
+          };
+        }
+      }
+      return { r: 0, g: 0, b: 0, alpha: 1 };
+    }
+
+    // 轉換為RGBA字串
+    function toRGBA(r, g, b, alpha) {
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // 轉換為HEX字串
+    function toHEX(r, g, b) {
+      return '#' + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      }).join('');
+    }
+
+    // 建立顏色選擇器
+    function createColorPicker(key, config) {
+      const item = document.createElement('div');
+      item.className = 'color-item';
+      
+      // 左側大色塊
+      const preview = document.createElement('div');
+      preview.className = 'color-preview';
+      // 透明input[type=color]覆蓋
+      const colorPicker = document.createElement('input');
+      colorPicker.type = 'color';
+      colorPicker.value = config.color;
+      preview.appendChild(colorPicker);
+      colorPicker.oninput = (e) => {
+        config.color = e.target.value;
+        updateDisplay();
+      };
+
+      // 右側資訊
+      const info = document.createElement('div');
+      info.className = 'color-info';
+      
+      const label = document.createElement('div');
+      label.className = 'color-label';
+      label.textContent = config.label;
+      
+      const controls = document.createElement('div');
+      controls.className = 'color-controls';
+      
+      // RGBA拉條
+      const color = parseColor(config.color);
+      const rSlider = document.createElement('input');
+      rSlider.type = 'range'; rSlider.min = 0; rSlider.max = 255; rSlider.value = color.r;
+      const gSlider = document.createElement('input');
+      gSlider.type = 'range'; gSlider.min = 0; gSlider.max = 255; gSlider.value = color.g;
+      const bSlider = document.createElement('input');
+      bSlider.type = 'range'; bSlider.min = 0; bSlider.max = 255; bSlider.value = color.b;
+      const aSlider = document.createElement('input');
+      aSlider.type = 'range'; aSlider.min = 0; aSlider.max = 1; aSlider.step = 0.01; aSlider.value = config.alpha;
+
+      // RGBA數值顯示
+      const valueDisplay = document.createElement('div');
+      valueDisplay.className = 'color-value';
+
+      // 拉條區塊
+      const rRow = document.createElement('div'); rRow.className = 'color-input';
+      rRow.appendChild(Object.assign(document.createElement('label'), {textContent: 'R'}));
+      rRow.appendChild(rSlider);
+      rRow.appendChild(Object.assign(document.createElement('span'), {textContent: rSlider.value, style: 'width:28px;text-align:center;'}));
+      const gRow = document.createElement('div'); gRow.className = 'color-input';
+      gRow.appendChild(Object.assign(document.createElement('label'), {textContent: 'G'}));
+      gRow.appendChild(gSlider);
+      gRow.appendChild(Object.assign(document.createElement('span'), {textContent: gSlider.value, style: 'width:28px;text-align:center;'}));
+      const bRow = document.createElement('div'); bRow.className = 'color-input';
+      bRow.appendChild(Object.assign(document.createElement('label'), {textContent: 'B'}));
+      bRow.appendChild(bSlider);
+      bRow.appendChild(Object.assign(document.createElement('span'), {textContent: bSlider.value, style: 'width:28px;text-align:center;'}));
+      const aRow = document.createElement('div'); aRow.className = 'color-input';
+      aRow.appendChild(Object.assign(document.createElement('label'), {textContent: 'A'}));
+      aRow.appendChild(aSlider);
+      aRow.appendChild(Object.assign(document.createElement('span'), {textContent: aSlider.value, style: 'width:28px;text-align:center;'}));
+
+      // 重置按鈕
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'reset-btn';
+      resetBtn.textContent = '重置';
+      resetBtn.onclick = () => resetColor(key);
+
+      // 更新顯示
+      function updateDisplay() {
+        // 同步拉條與色塊
+        const r = parseInt(rSlider.value), g = parseInt(gSlider.value), b = parseInt(bSlider.value), a = parseFloat(aSlider.value);
+        const rgba = toRGBA(r, g, b, a);
+        preview.style.background = rgba;
+        valueDisplay.textContent = rgba;
+        currentColors[key] = {
+          label: config.label,
+          color: toHEX(r, g, b),
+          alpha: a
+        };
+        rRow.querySelector('span').textContent = r;
+        gRow.querySelector('span').textContent = g;
+        bRow.querySelector('span').textContent = b;
+        aRow.querySelector('span').textContent = a;
+      }
+      // 拉條事件
+      [rSlider, gSlider, bSlider, aSlider].forEach(slider => slider.oninput = updateDisplay);
+
+      // 初始化顯示
+      updateDisplay();
+
+      // 組裝DOM
+      controls.appendChild(rRow);
+      controls.appendChild(gRow);
+      controls.appendChild(bRow);
+      controls.appendChild(aRow);
+      info.appendChild(label);
+      info.appendChild(controls);
+      info.appendChild(valueDisplay);
+      info.appendChild(resetBtn);
+      item.appendChild(preview);
+      item.appendChild(info);
+      return item;
+    }
+
+    // 重置單一顏色
+    function resetColor(key) {
+      const defaultColor = defaultColors[key];
+      currentColors[key] = JSON.parse(JSON.stringify(defaultColor));
+      loadTheme(); // 重新載入顯示
+      showStatus('已重置 ' + defaultColor.label);
+    }
+
+    // 顯示狀態訊息
+    function showStatus(message) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.style.opacity = '1';
+      setTimeout(() => {
+        status.style.opacity = '0';
+      }, 2000);
+    }
+
+    // 儲存主題
+    function saveTheme() {
+      localStorage.setItem('lotteryTheme', JSON.stringify(currentColors));
+      showStatus('主題已儲存！');
+    }
+
+    // 載入主題
+    function loadTheme() {
+      const saved = localStorage.getItem('lotteryTheme');
+      if (saved) {
+        currentColors = JSON.parse(saved);
+      }
+      renderPalette();
+      showStatus('主題已載入！');
+    }
+
+    // 還原預設
+    function resetToDefault() {
+      currentColors = JSON.parse(JSON.stringify(defaultColors));
+      renderPalette();
+      showStatus('已還原預設設定！');
+    }
+
+    // 匯出設定
+    function exportTheme() {
+      const dataStr = JSON.stringify(currentColors, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'lottery-theme.json';
+      link.click();
+      URL.revokeObjectURL(url);
+      showStatus('設定已匯出！');
+    }
+
+    // 匯入設定
+    function importTheme() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const imported = JSON.parse(e.target.result);
+              currentColors = imported;
+              renderPalette();
+              showStatus('設定已匯入！');
+            } catch (error) {
+              showStatus('匯入失敗：檔案格式錯誤');
+            }
+          };
+          reader.readAsText(file);
+        }
+      };
+      input.click();
+    }
+
+    // 渲染調色盤
+    function renderPalette() {
+      const palette = document.getElementById('palette');
+      palette.innerHTML = '';
+      
+      Object.entries(currentColors).forEach(([key, config]) => {
+        const picker = createColorPicker(key, config);
+        palette.appendChild(picker);
+      });
+    }
+
+    // 初始化
+    renderPalette();
+  </script>
+</body>
+</html> 
