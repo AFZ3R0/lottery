@@ -15,10 +15,60 @@
     .btns { margin-top: 2em; }
     button { font-size: 1em; padding: 0.5em 1.5em; margin-right: 1em; border-radius: 4px; border: none; background: #0ff; color: #222; cursor: pointer; font-weight: bold; }
     button:hover { background: #fff; color: #0ff; }
+    
+    /* 顏色配置集管理 */
+    .theme-collections { margin-bottom: 2em; padding: 1em; background: #333; border-radius: 8px; box-shadow: 0 2px 8px #0006; }
+    .theme-collections h2 { margin-top: 0; font-size: 1.2em; color: #0ff; }
+    .collection-tags { display: flex; flex-wrap: wrap; gap: 0.5em; margin-bottom: 1em; }
+    .collection-tag { padding: 0.5em 1em; background: #555; border-radius: 4px; cursor: pointer; position: relative; }
+    .collection-tag.active { background: #0ff; color: #222; }
+    .collection-tag:hover { background: #666; }
+    .collection-tag.active:hover { background: #fff; }
+    .collection-tag .delete-btn { position: absolute; top: -5px; right: -5px; background: #f00; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: none; }
+    .collection-tag:hover .delete-btn { display: block; }
+    .add-collection { padding: 0.5em 1em; background: #0aa; border-radius: 4px; cursor: pointer; border: 2px dashed #0ff; }
+    .add-collection:hover { background: #0cc; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+    .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #333; padding: 2em; border-radius: 8px; }
+    .modal input { width: 100%; padding: 0.5em; margin: 0.5em 0; background: #555; border: 1px solid #666; color: #fff; }
   </style>
 </head>
 <body>
   <h1>主題色彩調整 Theme Editor</h1>
+  
+  <!-- 顏色配置集管理 -->
+  <div class="theme-collections">
+    <h2>顏色配置集</h2>
+    <div class="collection-tags" id="collectionTags">
+      <!-- 預設顏色集 -->
+      <div class="collection-tag active" data-name="default">
+        預設
+      </div>
+      <!-- 自訂顏色集會動態加入 -->
+    </div>
+    <div class="add-collection" onclick="showAddModal()">+ 新增顏色集</div>
+  </div>
+
+  <!-- 新增顏色集對話框 -->
+  <div class="modal" id="addModal">
+    <div class="modal-content">
+      <h3>新增顏色集</h3>
+      <input type="text" id="newCollectionName" placeholder="輸入顏色集名稱">
+      <button onclick="addCollection()">確定</button>
+      <button onclick="hideAddModal()">取消</button>
+    </div>
+  </div>
+
+  <!-- 重命名對話框 -->
+  <div class="modal" id="renameModal">
+    <div class="modal-content">
+      <h3>重命名顏色集</h3>
+      <input type="text" id="renameCollectionName" placeholder="輸入新名稱">
+      <button onclick="renameCollection()">確定</button>
+      <button onclick="hideRenameModal()">取消</button>
+    </div>
+  </div>
+
   <form id="themeForm">
     <div class="theme-group">
       <h2>卡片</h2>
@@ -111,10 +161,28 @@
       { id: 'border-cyan', var: '--border-cyan' },
       { id: 'border-orange', var: '--border-orange' },
     ];
+
+    // 預設顏色集（從 index_origin.css 解析）
+    const defaultColors = {
+      '--card-bg': 'rgba(0,127,127,0.37)',
+      '--card-border': 'rgba(127,255,255,0.25)',
+      '--glow-cyan': 'rgba(0,255,255,0.5)',
+      '--text-primary': '#ffffff',
+      '--text-secondary': 'rgba(255,255,255,0.75)',
+      '--text-accent': '#db5c58',
+      '--glow-orange': 'rgba(253,105,0,0.95)',
+      '--border-cyan': 'rgba(127,255,255,0.25)',
+      '--border-orange': 'rgba(253,105,0,0.25)'
+    };
+
+    let currentCollection = 'default';
+    let collections = { default: defaultColors };
+
     // 取得目前CSS變數值
     function getVar(v) {
       return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
     }
+
     // 解析 rgba/hex
     function parseColor(val) {
       let color = '#000000', alpha = 1;
@@ -136,21 +204,121 @@
       }
       return {color, alpha};
     }
+
     // 組合成 rgba
     function toRgba(hex, alpha) {
       let rgb = hex.replace('#','').match(/.{2}/g).map(x=>parseInt(x,16));
       return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
     }
-    // 初始化顏色選擇器
-    function initTheme() {
-      colorVars.forEach(({id, var: v}) => {
-        let val = localStorage.getItem(v) || getVar(v);
-        let {color, alpha} = parseColor(val);
-        document.getElementById(id).value = color;
-        document.getElementById(id+'-alpha').value = alpha;
-        document.getElementById('val-'+id).textContent = toRgba(color, alpha);
+
+    // 載入顏色集
+    function loadCollections() {
+      const saved = localStorage.getItem('themeCollections');
+      if (saved) {
+        collections = JSON.parse(saved);
+        if (!collections.default) collections.default = defaultColors;
+      }
+      renderCollectionTags();
+    }
+
+    // 渲染顏色集標籤
+    function renderCollectionTags() {
+      const container = document.getElementById('collectionTags');
+      container.innerHTML = '';
+      
+      Object.keys(collections).forEach(name => {
+        const tag = document.createElement('div');
+        tag.className = `collection-tag ${name === currentCollection ? 'active' : ''}`;
+        tag.dataset.name = name;
+        tag.textContent = name === 'default' ? '預設' : name;
+        
+        if (name !== 'default') {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'delete-btn';
+          deleteBtn.textContent = '×';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteCollection(name);
+          };
+          tag.appendChild(deleteBtn);
+        }
+        
+        tag.onclick = () => switchCollection(name);
+        container.appendChild(tag);
       });
     }
+
+    // 切換顏色集
+    function switchCollection(name) {
+      currentCollection = name;
+      const colors = collections[name];
+      
+      colorVars.forEach(({id, var: v}) => {
+        const val = colors[v];
+        const {color, alpha} = parseColor(val);
+        document.getElementById(id).value = color;
+        document.getElementById(id+'-alpha').value = alpha;
+        document.getElementById('val-'+id).textContent = val;
+        document.documentElement.style.setProperty(v, val);
+      });
+      
+      renderCollectionTags();
+      saveCollections();
+    }
+
+    // 新增顏色集
+    function showAddModal() {
+      document.getElementById('addModal').style.display = 'block';
+      document.getElementById('newCollectionName').value = '';
+      document.getElementById('newCollectionName').focus();
+    }
+
+    function hideAddModal() {
+      document.getElementById('addModal').style.display = 'none';
+    }
+
+    function addCollection() {
+      const name = document.getElementById('newCollectionName').value.trim();
+      if (!name) return;
+      
+      // 複製目前設定作為新顏色集
+      const newColors = {};
+      colorVars.forEach(({var: v}) => {
+        newColors[v] = document.documentElement.style.getPropertyValue(v) || getVar(v);
+      });
+      
+      collections[name] = newColors;
+      hideAddModal();
+      switchCollection(name);
+    }
+
+    // 刪除顏色集
+    function deleteCollection(name) {
+      if (Object.keys(collections).length <= 1) {
+        alert('至少需要保留一個顏色集！');
+        return;
+      }
+      
+      delete collections[name];
+      if (currentCollection === name) {
+        switchCollection('default');
+      } else {
+        renderCollectionTags();
+        saveCollections();
+      }
+    }
+
+    // 儲存顏色集到 localStorage
+    function saveCollections() {
+      localStorage.setItem('themeCollections', JSON.stringify(collections));
+    }
+
+    // 初始化顏色選擇器
+    function initTheme() {
+      loadCollections();
+      switchCollection(currentCollection);
+    }
+
     // 即時預覽
     document.getElementById('themeForm').addEventListener('input', e => {
       colorVars.forEach(({id, var: v}) => {
@@ -161,23 +329,26 @@
         document.getElementById('val-'+id).textContent = rgba;
       });
     });
+
     // 儲存主題
     function saveTheme() {
+      // 更新目前顏色集
       colorVars.forEach(({id, var: v}) => {
         let color = document.getElementById(id).value;
         let alpha = document.getElementById(id+'-alpha').value;
         let rgba = toRgba(color, alpha);
-        localStorage.setItem(v, rgba);
+        collections[currentCollection][v] = rgba;
       });
+      
+      saveCollections();
       alert('主題已儲存！請重新整理主頁面查看效果。');
     }
+
     // 重置預設
     function resetTheme() {
-      colorVars.forEach(({id, var: v}) => {
-        localStorage.removeItem(v);
-      });
-      location.reload();
+      switchCollection('default');
     }
+
     // 載入時初始化
     initTheme();
   </script>

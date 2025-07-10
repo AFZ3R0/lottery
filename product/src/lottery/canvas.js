@@ -120,9 +120,6 @@
       c.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    // 保證星點繪製時 filter 為 none
-    c.filter = 'none';
-
     c.fillStyle = "rgba(209, 255, 255, " + radius + ")";
     for (i = 0; i < numStars; i++) {
       star = stars[i];
