@@ -1,38 +1,57 @@
 /* 抽獎系統統一顏色變量 */
 
 :root {
-  /* 主背景 */
-  --main-bg-gradient: linear-gradient(to bottom, #000000 0%, #666666 100%);
-
-  /* 卡片 */
-  --card-bg: #222c33;
-  --card-border: rgba(127,255,255,0.25);
-  --card-shadow: 0 0 12px rgba(0,255,255,0.5);
-  --card-glow: 0 0 15px 0 rgba(0,255,255,0.5);
-
-  /* 文字 */
-  --text-primary: #fff;
-  --text-secondary: rgba(255,255,255,0.75);
-  --text-tertiary: rgba(255,255,255,0.85);
-  --text-accent: #db5c58;
-
-  /* 光暈/強調 */
-  --glow-cyan: rgba(0,255,255,0.75);
-  --glow-cyan-strong: rgba(0,255,255,0.95);
-  --glow-orange: rgba(253,105,0,0.95);
-  --glow-orange-weak: rgba(253,105,0,0.85);
-
-  /* 邊框 */
-  --border-cyan: rgba(127,255,255,0.25);
-  --border-cyan-strong: rgba(127,255,255,0.75);
-  --border-orange: rgba(253,105,0,0.25);
-  --border-white: rgba(255,255,255,0.5);
-
-  /* 其他 */
+  /* 主要背景色 */
+  --bg-primary: #131313;
+  --bg-secondary: #02101c;
+  
+  /* 主要文字顏色 */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-tertiary: rgba(255, 255, 255, 0.85);
+  
+  /* 青色系 - 主要主題色 */
+  --cyan-primary: rgba(0, 255, 255, 0.5);
+  --cyan-secondary: rgba(0, 255, 255, 0.75);
+  --cyan-tertiary: rgba(0, 255, 255, 0.95);
+  --cyan-light: rgba(127, 255, 255, 0.25);
+  --cyan-medium: rgba(127, 255, 255, 0.75);
+  --cyan-dark: rgba(0, 127, 127, 0.37);
+  --cyan-glow: rgba(0, 255, 255, 0.5);
+  --cyan-glow-strong: rgba(0, 255, 255, 0.75);
+  
+  /* 橙色系 - 高亮和獎品色 */
+  --orange-primary: rgba(253, 105, 0, 0.95);
+  --orange-secondary: rgba(253, 105, 0, 0.85);
+  --orange-tertiary: rgba(253, 105, 0, 0.9);
+  --orange-border: rgba(253, 105, 0, 0.25);
+  --orange-text: #db5c58;
+  
+  /* 黑色系 */
+  --black-primary: #000000;
+  --black-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* 白色系 */
+  --white-primary: #fff;
+  --white-overlay: rgba(255, 255, 255, 0.15);
+  --white-border: rgba(255, 255, 255, 0.5);
+  --white-glow: rgba(255, 255, 255, 0.95);
+  
+  /* 進度條顏色 */
   --progress-bg: #d9534f;
+  
+  /* 動畫效果顏色 */
   --shine-color: #03e9f4;
-  --starfield-bg: rgba(0,10,20,1);
-  --star-color: rgba(209,255,255,0.8);
-  --black-overlay: rgba(0,0,0,0.5);
-  --white-overlay: rgba(255,255,255,0.15);
+  
+  /* 星空背景顏色 */
+  --starfield-bg: rgba(0, 10, 20, 1);
+  --star-color: rgba(209, 255, 255, 0.8);
+  
+  /* 自定義游標顏色 */
+  --cursor-bg: rgba(255, 255, 255, 0.18);
+  --cursor-shadow: rgba(255, 255, 255, 0.10);
+  
+  /* 卡片隨機背景色範圍 */
+  --card-bg-min: 0.25;
+  --card-bg-max: 0.95;
 } 
