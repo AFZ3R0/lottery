@@ -1,51 +1,17 @@
-/* 新增主題色CSS變數 */
-:root {
-  --main-bg: #ffffff;
-  --sub-bg: #f8f9fa;
-  --card-bg: rgba(0,127,127,0.7);
-  --card-gold: #FFD700;
-  --progress-red: #d9534f;
-  --btn-blue: #007bff;
-  --btn-cyan: #17a2b8;
-  --text-main: #222222;
-  --text-sub: #333333;
-  --text-black: #000000;
-  --cursor-dot: rgba(255,255,255,0.18);
-  --cursor-shadow: rgba(255,255,255,0.10);
-  --card-orange: rgba(253,105,0,0.95);
-  --card-orange-light: rgba(253,105,0,0.85);
-  --card-orange-adv: rgba(253,105,0,0.9);
-  --bg-dark: #131313;
-  --bg-darkblue: #02101c;
-  --shadow-cyan: rgba(0,255,255,0.5);
-  --border-cyan: rgba(0,255,255,0.75);
-  --border-cyan-light: rgba(127,255,255,0.25);
-  --text-cyan: rgba(127,255,255,0.75);
-  --text-main-card: rgba(255,255,255,0.75);
-  --card-danmu-bg: rgba(0,127,127,0.37);
-  --border-anim: #03e9f4;
-  --prize-shine: #db5c58;
-  --progress-mask: rgba(0,0,0,0.5);
-  --progress-stripe: rgba(255,255,255,0.15);
-  --bubble-bg: rgba(127,255,255,0.25);
-  --bubble-text: rgba(127,255,255,0.75);
-  --music-btn: rgba(253,105,0,0.9);
-}
-
 html,
 body {
   height: 100%;
 }
 
 body {
-  background: linear-gradient(to bottom, var(--bg-dark, #000000) 0%, var(--bg-darkblue, #666666) 100%);
+  background: linear-gradient(to bottom, #000000 0%, #666666 100%);
   margin: 0;
   font-family: Helvetica, sans-serif;
   overflow: hidden;
 }
 
 a {
-  color: var(--text-main-card, #ffffff);
+  color: #ffffff;
 }
 
 .none {
@@ -92,16 +58,16 @@ a {
 .element {
   width: 12vh;
   height: 16vh;
-  box-shadow: 0 0 12px var(--shadow-cyan, rgba(0,255,255,0.5));
-  border: 1px solid var(--border-cyan-light, rgba(127,255,255,0.25));
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+  border: 1px solid rgba(127, 255, 255, 0.25);
   text-align: center;
   cursor: default;
   transition: background-color 0.3s ease-in;
 }
 
 .element:hover {
-  box-shadow: 0 0 12px var(--border-cyan, rgba(0,255,255,0.75));
-  border: 1px solid var(--border-cyan, rgba(127,255,255,0.75));
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.75);
+  border: 1px solid rgba(127, 255, 255, 0.75);
 }
 
 .element .name {
@@ -111,8 +77,8 @@ a {
   right: 1vh;
   font-size: 2.9vh;
   font-weight: bold;
-  color: var(--text-main-card, rgba(255,255,255,0.75));
-  text-shadow: 0 0 1vh var(--shadow-cyan, rgba(0,255,255,0.95));
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 0 1vh rgba(0, 255, 255, 0.95);
   text-align: center;
   word-wrap: break-word;
   word-break: normal;
@@ -136,7 +102,7 @@ a {
   left: 1vh;
   right: 1vh;
   font-size: 1.6vh;
-  color: var(--text-cyan, rgba(127,255,255,0.75));
+  color: rgba(127, 255, 255, 0.75);
   text-align: center;
   word-wrap: break-word;
   word-break: normal;
@@ -155,9 +121,9 @@ a {
 }
 
 button {
-  color: var(--text-cyan, rgba(127,255,255,0.75));
+  color: rgba(127, 255, 255, 0.75);
   background: transparent;
-  outline: 1px solid var(--border-cyan, rgba(127,255,255,0.75));
+  outline: 1px solid rgba(127, 255, 255, 0.75);
   border: 0;
   padding: 1.6vh 4vh;
   margin: 0 4.6vh;
@@ -167,22 +133,22 @@ button {
 }
 
 button:hover {
-  background-color: var(--shadow-cyan, rgba(0,255,255,0.5));
+  background-color: rgba(0, 255, 255, 0.5);
 }
 
 button:active {
-  color: var(--text-black, #000000);
-  background-color: var(--border-cyan, rgba(0,255,255,0.75));
+  color: #000000;
+  background-color: rgba(0, 255, 255, 0.75);
 }
 
 .highlight {
-  background-color: var(--card-orange, rgba(253,105,0,0.95)) !important;
-  box-shadow: 0 0 12px var(--card-orange, rgba(253,105,0,0.95));
-  border: 1px solid var(--card-orange-adv, rgba(253,105,0,0.25));
+  background-color: rgba(253, 105, 0, 0.95) !important;
+  box-shadow: 0 0 12px rgba(253, 105, 0, 0.95);
+  border: 1px solid rgba(253, 105, 0, 0.25);
 }
 
 .highlight.element .name {
-  text-shadow: 0 0 16px var(--text-main-card, rgba(255,255,255,0.95));
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.95);
 }
 
 .prize.element .name {
@@ -191,15 +157,15 @@ button:active {
 
 .prize.element {
   transition: background-color 1.5s ease-in 0.3s;
-  background-color: var(--card-orange-light, rgba(253,105,0,0.85)) !important;
-  box-shadow: 0 0 12px var(--card-orange, rgba(253,105,0,0.95));
+  background-color: rgba(253, 105, 0, 0.85) !important;
+  box-shadow: 0 0 12px rgba(253, 105, 0, 0.95);
 }
 
 .prize .name,
 .prize .department,
 .highlight .name,
 .highlight .department {
-  color: var(--text-main-card, rgba(255,255,255,0.85));
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .dan-mu {
@@ -214,10 +180,10 @@ button:active {
   line-height: 2.2vh;
   border-radius: 1vh;
   box-sizing: border-box;
-  background-color: var(--card-danmu-bg, rgba(0,127,127,0.37));
-  box-shadow: 0 0 4px var(--shadow-cyan, rgba(0,255,255,0.5));
-  border: 1px solid var(--border-cyan-light, rgba(127,255,255,0.25));
-  color: var(--text-cyan, rgba(127,255,255,0.75));
+  background-color: rgba(0, 127, 127, 0.37);
+  box-shadow: 0 0 4px rgba(0, 255, 255, 0.5);
+  border: 1px solid rgba(127, 255, 255, 0.25);
+  color: rgba(127, 255, 255, 0.75);
 }
 
 .dan-mu.active {
@@ -246,9 +212,9 @@ button:active {
   justify-content: center;
   border-radius: 4px;
   flex-wrap: nowrap;
-  background-color: var(--card-danmu-bg, rgba(0,127,127,0.37));
-  border: 1px solid var(--border-cyan-light, rgba(127,255,255,0.25));
-  color: var(--text-cyan, rgba(127,255,255,0.75));
+  background-color: rgba(0, 127, 127, 0.37);
+  border: 1px solid rgba(127, 255, 255, 0.25);
+  color: rgba(127, 255, 255, 0.75);
   width: 30vh;
   height: 10vh;
   box-sizing: border-box;
@@ -260,8 +226,8 @@ button:active {
   height: 8vh;
   margin-right: 1.2vh;
   border-radius: 50%;
-  background-color: var(--main-bg, #fff);
-  text-shadow: 0 0 1vh var(--shadow-cyan, rgba(0,255,255,0.95));
+  background-color: #fff;
+  text-shadow: 0 0 1vh rgba(0, 255, 255, 0.95);
   overflow: hidden;
 }
 
@@ -290,7 +256,7 @@ button:active {
 
 .prize-count .progress {
   height: 1.8vh;
-  background: var(--progress-mask, rgba(0,0,0,0.5));
+  background: rgba(0, 0, 0, 0.5);
   padding: 1px;
   overflow: visible;
   border-radius: 1vh;
@@ -300,7 +266,7 @@ button:active {
   border-radius: 1.8vh;
   position: relative;
   animation: animate-positive 2s;
-  background-color: var(--progress-red, #d9534f);
+  background-color: #d9534f;
   height: 1.8vh;
   -webkit-transition: width 0.6s ease;
   -o-transition: width 0.6s ease;
@@ -313,12 +279,28 @@ button:active {
 }
 
 .progress-bar-striped {
-  background-image: linear-gradient(45deg,
-      var(--progress-stripe, rgba(255,255,255,0.15)) 25%,
+  background-image: -webkit-linear-gradient(45deg,
+      rgba(255, 255, 255, 0.15) 25%,
       transparent 25%,
       transparent 50%,
-      var(--progress-stripe, rgba(255,255,255,0.15)) 50%,
-      var(--progress-stripe, rgba(255,255,255,0.15)) 75%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
+      transparent 75%,
+      transparent);
+  background-image: -o-linear-gradient(45deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
+      transparent 75%,
+      transparent);
+  background-image: linear-gradient(45deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
       transparent 75%,
       transparent);
   -webkit-background-size: 8px 8px;
@@ -378,7 +360,7 @@ button:active {
 }
 
 .shine {
-  box-shadow: 0 0 15px 0 var(--shadow-cyan, rgba(0,255,255,0.5));
+  box-shadow: 0 0 15px 0 rgba(0, 255, 255, 0.5);
   transform: scale(1.2);
   transform-origin: left center;
   position: relative;
@@ -411,7 +393,7 @@ button:active {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--border-anim, #03e9f4));
+  background: linear-gradient(90deg, transparent, #03e9f4);
   animation: animate1 1s linear infinite
 }
 
@@ -431,7 +413,7 @@ button:active {
   right: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(180deg, transparent, var(--border-anim, #03e9f4));
+  background: linear-gradient(180deg, transparent, #03e9f4);
   animation: animate2 1s linear infinite;
   animation-delay: .25s
 }
@@ -452,7 +434,7 @@ button:active {
   right: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(270deg, transparent, var(--border-anim, #03e9f4));
+  background: linear-gradient(270deg, transparent, #03e9f4);
   animation: animate3 1s linear infinite;
   animation-delay: .50s
 }
@@ -473,7 +455,7 @@ button:active {
   left: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(360deg, transparent, var(--border-anim, #03e9f4));
+  background: linear-gradient(360deg, transparent, #03e9f4);
   animation: animate4 1s linear infinite;
   animation-delay: .75s
 }
@@ -505,7 +487,7 @@ button:active {
 .prize-shine {
   font-size: 5vh;
   font-weight: bold;
-  color: var(--prize-shine, #db5c58);
+  color: #db5c58;
   vertical-align: middle;
   padding: 0 6px;
 }
@@ -526,8 +508,8 @@ button:active {
   margin: 4px 0;
   box-sizing: border-box;
   font-size: 14px;
-  background-color: var(--bubble-bg, rgba(127,255,255,0.25));
-  color: var(--bubble-text, rgba(127,255,255,0.75));
+  background-color: rgba(127, 255, 255, 0.25);
+  color: rgba(127, 255, 255, 0.75);
 }
 
 .music {
@@ -551,8 +533,8 @@ button:active {
   font-size: 1.4vh;
   color: #fff;
   cursor: pointer;
-  background-color: var(--music-btn, rgba(253,105,0,0.9));
-  border: 1px solid var(--progress-stripe, rgba(255,255,255,0.5));
+  background-color: rgba(253, 105, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .rotate-active {
@@ -588,7 +570,7 @@ button:active {
 
 #lottery {
   animation: breath 1.6s linear infinite;
-  box-shadow: 0px 0px 15px var(--border-cyan, rgb(127 255 255 / 75%));
+  box-shadow: 0px 0px 15px rgb(127 255 255 / 75%);
 }
 
 @keyframes breath {

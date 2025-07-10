@@ -277,10 +277,21 @@
       colorPicker.type = 'color';
       colorPicker.value = config.color;
       preview.appendChild(colorPicker);
-      colorPicker.oninput = (e) => {
-        config.color = e.target.value;
+      // 修正：同時監聽oninput和onchange，確保各瀏覽器都能同步
+      function handleColorChange(e) {
+        const val = e.target.value;
+        // 解析HEX
+        const r = parseInt(val.substr(1,2),16);
+        const g = parseInt(val.substr(3,2),16);
+        const b = parseInt(val.substr(5,2),16);
+        rSlider.value = r;
+        gSlider.value = g;
+        bSlider.value = b;
+        config.color = val;
         updateDisplay();
-      };
+      }
+      colorPicker.oninput = handleColorChange;
+      colorPicker.onchange = handleColorChange;
 
       // 右側資訊
       const info = document.createElement('div');

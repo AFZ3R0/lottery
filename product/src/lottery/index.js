@@ -1010,3 +1010,19 @@ window.onload = function () {
     cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
   });
 })();
+
+// 主題色自動套用
+(function applyLotteryTheme() {
+  const theme = localStorage.getItem('lotteryTheme');
+  if (theme) {
+    const colors = JSON.parse(theme);
+    Object.entries(colors).forEach(([key, conf]) => {
+      const { color, alpha } = conf;
+      const r = parseInt(color.substr(1,2),16);
+      const g = parseInt(color.substr(3,2),16);
+      const b = parseInt(color.substr(5,2),16);
+      const rgba = `rgba(${r},${g},${b},${alpha})`;
+      document.documentElement.style.setProperty(`--${key}`, rgba);
+    });
+  }
+})();
