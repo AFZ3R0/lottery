@@ -246,7 +246,11 @@
       // 新增自訂游標底色
       'cursor-bg': { label: '游標底色', color: '#ffffff', alpha: 0.18 },
       // 新增自訂游標陰影
-      'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 }
+      'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 },
+      // 新增背景模糊效果
+      'bg-blur': { label: '背景模糊程度', color: '#000000', alpha: 8 },
+      // 新增背景變暗效果
+      'bg-darken': { label: '背景變暗程度', color: '#000000', alpha: 0.5 }
     };
 
     let currentColors = JSON.parse(JSON.stringify(defaultColors));
@@ -290,6 +294,11 @@
     function createColorPicker(key, config) {
       const item = document.createElement('div');
       item.className = 'color-item';
+      
+      // 特殊處理：背景模糊和變暗效果
+      if (key === 'bg-blur' || key === 'bg-darken') {
+        return createValuePicker(key, config);
+      }
       
       // 左側大色塊
       const preview = document.createElement('div');
@@ -404,6 +413,118 @@
       return item;
     }
 
+    // 建立數值選擇器（用於背景模糊和變暗）
+    function createValuePicker(key, config) {
+      const item = document.createElement('div');
+      item.className = 'color-item';
+      
+      // 左側預覽區
+      const preview = document.createElement('div');
+      preview.className = 'color-preview';
+      preview.style.background = 'linear-gradient(45deg, #333, #666)';
+      preview.style.display = 'flex';
+      preview.style.alignItems = 'center';
+      preview.style.justifyContent = 'center';
+      preview.style.color = '#fff';
+      preview.style.fontSize = '12px';
+      preview.style.fontWeight = 'bold';
+      
+      // 右側資訊
+      const info = document.createElement('div');
+      info.className = 'color-info';
+      
+      const label = document.createElement('div');
+      label.className = 'color-label';
+      const itemIndex = Object.keys(currentColors).indexOf(key) + 1;
+      label.textContent = `#${itemIndex.toString().padStart(2, '0')} ${config.label}`;
+      
+      const controls = document.createElement('div');
+      controls.className = 'color-controls';
+      
+      // 數值拉條
+      const valueSlider = document.createElement('input');
+      valueSlider.type = 'range';
+      if (key === 'bg-blur') {
+        valueSlider.min = 0;
+        valueSlider.max = 20;
+        valueSlider.step = 0.5;
+        valueSlider.value = parseFloat(config.alpha); // 直接使用像素值
+      } else if (key === 'bg-darken') {
+        valueSlider.min = 0;
+        valueSlider.max = 1;
+        valueSlider.step = 0.01;
+        valueSlider.value = config.alpha;
+      }
+      
+      // 數值顯示
+      const valueDisplay = document.createElement('div');
+      valueDisplay.className = 'color-value';
+      
+      // 更新顯示
+      function updateDisplay() {
+        let displayValue;
+        if (key === 'bg-blur') {
+          displayValue = `${valueSlider.value}px`;
+          preview.textContent = displayValue;
+          // 設定全域變數
+          window.bgBlurValue = displayValue;
+          // 儲存到 localStorage
+          localStorage.setItem('bgBlurValue', displayValue);
+          // 觸發 canvas 重新繪製
+          if (window.executeFrame) {
+            console.log('觸發背景模糊更新:', displayValue);
+            // 強制重新繪製
+            setTimeout(() => {
+              window.executeFrame();
+            }, 10);
+          }
+        } else if (key === 'bg-darken') {
+          displayValue = valueSlider.value;
+          preview.textContent = `${Math.round(displayValue * 100)}%`;
+          // 設定全域變數
+          window.bgDarkenValue = parseFloat(displayValue);
+          // 儲存到 localStorage
+          localStorage.setItem('bgDarkenValue', displayValue);
+          // 觸發 canvas 重新繪製
+          if (window.executeFrame) {
+            console.log('觸發背景變暗更新:', displayValue);
+            // 強制重新繪製
+            setTimeout(() => {
+              window.executeFrame();
+            }, 10);
+          }
+        }
+        valueDisplay.textContent = displayValue;
+        currentColors[key] = {
+          label: config.label,
+          color: config.color,
+          alpha: key === 'bg-blur' ? parseFloat(valueSlider.value) : parseFloat(valueSlider.value)
+        };
+      }
+      
+      valueSlider.oninput = updateDisplay;
+      
+      // 重置按鈕
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'reset-btn';
+      resetBtn.textContent = '重置';
+      resetBtn.onclick = () => resetColor(key);
+      
+      // 組裝DOM
+      controls.appendChild(valueSlider);
+      info.appendChild(label);
+      info.appendChild(controls);
+      info.appendChild(valueDisplay);
+      info.appendChild(resetBtn);
+      item.appendChild(preview);
+      item.appendChild(info);
+      
+      // 初始化顯示
+      updateDisplay();
+      
+      return item;
+    }
+
     // 重置單一顏色
     function resetColor(key) {
       const defaultColor = defaultColors[key];
@@ -448,8 +569,59 @@
           }
         });
       } else {
+        // 如果沒有儲存的主題，嘗試從 CSS 變數讀取當前設定
         currentColors = JSON.parse(JSON.stringify(defaultColors));
+        
+        try {
+          const computedStyle = getComputedStyle(document.documentElement);
+          Object.keys(defaultColors).forEach(key => {
+            const cssVar = computedStyle.getPropertyValue(`--${key}`);
+            if (cssVar && cssVar.trim() !== '') {
+              // 解析 rgba 值
+              const rgbaMatch = cssVar.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
+              if (rgbaMatch) {
+                const r = parseInt(rgbaMatch[1]);
+                const g = parseInt(rgbaMatch[2]);
+                const b = parseInt(rgbaMatch[3]);
+                const alpha = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
+                
+                // 轉換為 HEX
+                const hex = '#' + [r, g, b].map(x => {
+                  const hex = x.toString(16);
+                  return hex.length === 1 ? '0' + hex : hex;
+                }).join('');
+                
+                currentColors[key] = {
+                  label: defaultColors[key].label,
+                  color: hex,
+                  alpha: alpha
+                };
+                console.log(`從 CSS 變數讀取 ${key}:`, hex, alpha);
+              }
+            }
+          });
+        } catch (error) {
+          console.log('讀取 CSS 變數失敗，使用預設值');
+        }
       }
+      
+      // 從 localStorage 讀取背景參數設定
+      const bgBlurValue = localStorage.getItem('bgBlurValue');
+      const bgDarkenValue = localStorage.getItem('bgDarkenValue');
+      
+      if (bgBlurValue) {
+        // 提取數值（去掉 'px'）
+        const blurNum = parseFloat(bgBlurValue);
+        currentColors['bg-blur'].alpha = blurNum;
+        console.log('載入背景模糊設定:', blurNum);
+      }
+      
+      if (bgDarkenValue !== null) {
+        const darkenNum = parseFloat(bgDarkenValue);
+        currentColors['bg-darken'].alpha = darkenNum;
+        console.log('載入背景變暗設定:', darkenNum);
+      }
+      
       renderPalette();
       showStatus('主題已載入！');
     }
@@ -457,6 +629,11 @@
     // 還原預設
     function resetToDefault() {
       currentColors = JSON.parse(JSON.stringify(defaultColors));
+      
+      // 清除背景參數設定
+      localStorage.removeItem('bgBlurValue');
+      localStorage.removeItem('bgDarkenValue');
+      
       renderPalette();
       showStatus('已還原預設設定！');
     }
@@ -495,6 +672,13 @@
                     color: imported[key].color,
                     alpha: imported[key].alpha
                   };
+                  // 特殊處理背景效果
+                  if (key === 'bg-blur') {
+                    const blurValue = `${imported[key].alpha}px`;
+                    document.documentElement.style.setProperty('--bg-blur', blurValue);
+                  } else if (key === 'bg-darken') {
+                    document.documentElement.style.setProperty('--bg-darken', imported[key].alpha);
+                  }
                 } else {
                   currentColors[key] = JSON.parse(JSON.stringify(defaultColors[key]));
                 }
@@ -522,6 +706,9 @@
       });
     }
 
+    // 初始化時先載入當前設定
+    loadTheme();
+    
     // 初始化
     renderPalette();
 
