@@ -321,7 +321,9 @@
       
       const label = document.createElement('div');
       label.className = 'color-label';
-      label.textContent = config.label;
+      // 加上編號
+      const itemIndex = Object.keys(currentColors).indexOf(key) + 1;
+      label.textContent = `#${itemIndex.toString().padStart(2, '0')} ${config.label}`;
       
       const controls = document.createElement('div');
       controls.className = 'color-controls';
