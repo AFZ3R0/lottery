@@ -235,8 +235,8 @@ button:active {
 #prizeBar {
   position: fixed;
   left: 0;
-  padding-left: 1.2vh;
   top: 1.2vh;
+  padding-left: 1.2vh;
   z-index: 2;
 }
 
@@ -244,6 +244,19 @@ button:active {
   margin: 0;
   padding: 0;
   list-style: none;
+  position: relative;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.prize-list::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Webkit */
+}
+
+/* fade 遮罩 */
+.prize-list-fade {
+  /* 移除 fade 遮罩樣式 */
+  display: none;
 }
 
 .prize-item {
@@ -508,6 +521,9 @@ button:active {
   line-height: 5vh;
   font-size: 1.6vh;
   margin: 2.4vh 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .prize-shine {

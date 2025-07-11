@@ -61,13 +61,34 @@ const prizes = [
     text: "六等奖",
     title: "漫步者蓝牙耳机",
     img: "../img/edifier.jpg"
+  },
+  {
+    type: 8,
+    count: 1,
+    text: "二等奖",
+    title: "华为 Mate30",
+    img: "../img/huawei.png"
+  },
+  {
+    type: 9,
+    count: 1,
+    text: "二等奖",
+    title: "华为 Mate30",
+    img: "../img/huawei.png"
+  },
+  {
+    type: 10,
+    count: 1,
+    text: "二等奖",
+    title: "华为 Mate30",
+    img: "../img/huawei.png"
   }
 ];
 
 /**
  * 一次抽取的奖品个数与prizes对应
  */
-const EACH_COUNT = [1, 1, 5, 6, 7, 8, 9, 10];
+const EACH_COUNT = [1, 1, 5, 6, 7, 8, 9, 10,1,1,1];
 
 /**
  * 卡片公司名称标识

@@ -158,32 +158,47 @@ function showPrizeList(currentPrizeIndex) {
   if (currentPrize.type === defaultType) {
     currentPrize.count === "不限制";
   }
-  let htmlCode = `<div class="prize-mess">正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>，剩余<label id="prizeLeft" class="prize-shine">${currentPrize.count}</label>个</div><ul class="prize-list">`;
-  prizes.forEach(item => {
+  let htmlCode = `<div class="prize-mess">正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>，剩余<label id="prizeLeft" class="prize-shine">${currentPrize.count}</label>个</div>`;
+  htmlCode += `<ul class="prize-list">`;
+  let total = prizes.length;
+  let center = currentPrizeIndex;
+  let windowSize = 7; // 正抽+上下各三格
+  let half = Math.floor(windowSize / 2);
+  let start = Math.max(0, center - half);
+  let end = Math.min(total, start + windowSize);
+  // 若在底部不足windowSize，往上補
+  if (end - start < windowSize) {
+    start = Math.max(0, end - windowSize);
+  }
+
+  prizes.forEach((item, idx) => {
     if (item.type === defaultType) {
       return true;
     }
-    htmlCode += `<li id="prize-item-${item.type}" class="prize-item ${
-      item.type == currentPrize.type ? "shine" : ""
-    }">
+    let cls = "prize-item";
+    if (idx === currentPrizeIndex) {
+      cls += " shine";
+    } else if (/*已抽判斷*/ window.basicData && window.basicData.luckyUsers && (window.basicData.luckyUsers[item.type]||[]).length >= item.count) {
+      cls += " done";
+    } else if ((window.basicData && window.basicData.luckyUsers && (window.basicData.luckyUsers[item.type]||[]).length === 0)) {
+      cls += " blur";
+    }
+    // 只顯示視窗範圍內的格子
+    if (idx < start || idx >= end) {
+      cls += " hidden";
+    }
+    htmlCode += `<li id="prize-item-${item.type}" class="${cls}">
                         <span></span><span></span><span></span><span></span>
                         <div class="prize-img">
                             <img src="${item.img}" alt="${item.title}">
                         </div>
                         <div class="prize-text">
-                            <h5 class="prize-title">${item.text} ${
-      item.title
-    }</h5>
+                            <h5 class="prize-title">${item.text} ${item.title}</h5>
                             <div class="prize-count">
                                 <div class="progress">
-                                    <div id="prize-bar-${
-                                      item.type
-                                    }" class="progress-bar progress-bar-danger progress-bar-striped active" style="width: 100%;">
-                                    </div>
+                                    <div id="prize-bar-${item.type}" class="progress-bar progress-bar-danger progress-bar-striped active" style="width: 100%;"></div>
                                 </div>
-                                <div id="prize-count-${
-                                  item.type
-                                }" class="prize-count-left">
+                                <div id="prize-count-${item.type}" class="prize-count-left">
                                     ${item.count + "/" + item.count}
                                 </div>
                             </div>
@@ -191,8 +206,18 @@ function showPrizeList(currentPrizeIndex) {
                     </li>`;
   });
   htmlCode += `</ul>`;
+  htmlCode += `</div>`;
 
   document.querySelector("#prizeBar").innerHTML = htmlCode;
+  // 先觸發動畫，再自動滾動到正在抽的獎品
+  setTimeout(() => {
+    const list = document.querySelector('.prize-list');
+    const shine = list && list.querySelector('.shine');
+    if (shine && list) {
+      // 若列表可滾動，則自動將當前shine項目滾動到可見區域
+      shine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 50);
 }
 
 function resetPrize(currentPrizeIndex) {
@@ -242,6 +267,15 @@ let setPrizeData = (function () {
       elements.box && elements.box.classList.add("shine");
       prizeElement.prizeType.textContent = currentPrize.text;
       prizeElement.prizeText.textContent = currentPrize.title;
+
+      // 新增：自動滾動到當前 shine 的獎品
+      setTimeout(() => {
+        const list = document.querySelector('.prize-list');
+        const shine = list && list.querySelector('.shine');
+        if (shine && list) {
+          shine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
 
       lasetPrizeIndex = currentPrizeIndex;
     }
