@@ -1040,11 +1040,21 @@ window.onload = function () {
   document.body.addEventListener('mouseenter', () => { cursor.style.display = 'block'; });
   document.body.addEventListener('mouseleave', () => { cursor.style.display = 'none'; });
 
-  // 跟隨滑鼠移動
+  // 優化：用 requestAnimationFrame 節流游標移動
+  let mouseX = 0, mouseY = 0, cursorVisible = false;
   document.addEventListener('mousemove', function(e) {
-    cursor.style.display = 'block';
-    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursorVisible = true;
   });
+  function animateCursor() {
+    if (cursorVisible) {
+      cursor.style.display = 'block';
+      cursor.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+    }
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
 })();
 
 // 主題色自動套用

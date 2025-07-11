@@ -30,6 +30,8 @@
   --bubble-bg: rgba(127,255,255,0.25);
   --bubble-text: rgba(127,255,255,0.75);
   --music-btn: rgba(253,105,0,0.9);
+  --card-border: rgba(255,255,255,0.25);
+  --prize-border: #ffb300;
 }
 
 html,
@@ -42,6 +44,10 @@ body {
   margin: 0;
   font-family: Helvetica, sans-serif;
   overflow: hidden;
+}
+
+body, * {
+  cursor: none !important;
 }
 
 a {
@@ -93,7 +99,7 @@ a {
   width: 12vh;
   height: 16vh;
   box-shadow: 0 0 12px var(--shadow-cyan, rgba(0,255,255,0.5));
-  border: 1px solid var(--border-cyan-light, rgba(127,255,255,0.25));
+  border: 1.5px solid var(--card-border, rgba(255,255,255,0.25));
   text-align: center;
   cursor: default;
   transition: background-color 0.3s ease-in;
@@ -194,6 +200,7 @@ button:active {
   transition: background-color 1.5s ease-in 0.3s;
   background-color: var(--card-orange-light, rgba(253,105,0,0.85)) !important;
   box-shadow: 0 0 12px var(--card-orange, rgba(253,105,0,0.95));
+  border: 2.5px solid var(--prize-border, #ffb300);
 }
 
 .prize .name,

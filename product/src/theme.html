@@ -209,25 +209,20 @@
   <div class="status" id="status"></div>
 
   <script>
-    // 預設顏色配置（從color-palette-preview.html解析）
+    // 預設顏色配置（只保留 activeKeys 裡的 key）
     const defaultColors = {
       'main-bg': { label: '主背景色', color: '#ffffff', alpha: 1 },
-      'sub-bg': { label: '次背景色', color: '#f8f9fa', alpha: 1 },
+      'unused-black': { label: '無對應色', color: '#000000', alpha: 1 },
       'card-bg': { label: '卡片底色', color: '#007f7f', alpha: 0.7 },
       'card-gold': { label: '高亮卡片（金色）', color: '#FFD700', alpha: 1 },
-      'progress-red': { label: '進度條（紅）', color: '#d9534f', alpha: 1 },
       'btn-blue': { label: '主按鈕（藍）', color: '#007bff', alpha: 1 },
       'btn-cyan': { label: '高亮按鈕（青）', color: '#17a2b8', alpha: 1 },
       'text-main': { label: '主文字色', color: '#222222', alpha: 1 },
-      'text-sub': { label: '次文字色', color: '#333333', alpha: 1 },
-      'text-black': { label: '黑色文字', color: '#000000', alpha: 1 },
       'cursor-dot': { label: '自訂游標圓點', color: '#ffffff', alpha: 0.18 },
       'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 },
       'card-orange': { label: '卡片高亮（橙）', color: '#fd6900', alpha: 0.95 },
       'card-orange-light': { label: '卡片高亮（橙，淡）', color: '#fd6900', alpha: 0.85 },
       'card-orange-adv': { label: '卡片高亮（橙，進階）', color: '#fd6900', alpha: 0.9 },
-      'bg-dark': { label: '主背景（深灰黑）', color: '#131313', alpha: 1 },
-      'bg-darkblue': { label: '主背景（深藍黑）', color: '#02101c', alpha: 1 },
       'shadow-cyan': { label: '卡片陰影/按鈕hover', color: '#00ffff', alpha: 0.5 },
       'border-cyan': { label: '卡片邊框/按鈕active', color: '#00ffff', alpha: 0.75 },
       'border-cyan-light': { label: '卡片邊框淡色', color: '#7fffff', alpha: 0.25 },
@@ -241,16 +236,13 @@
       'bubble-bg': { label: '氣泡底色', color: '#7fffff', alpha: 0.25 },
       'bubble-text': { label: '氣泡文字', color: '#7fffff', alpha: 0.75 },
       'music-btn': { label: '音樂按鈕底色', color: '#fd6900', alpha: 0.9 },
-      // 新增卡片閃爍高亮色
       'shine-color': { label: '卡片閃爍高亮色', color: '#03e9f4', alpha: 1 },
-      // 新增自訂游標底色
       'cursor-bg': { label: '游標底色', color: '#ffffff', alpha: 0.18 },
-      // 新增自訂游標陰影
-      'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 },
-      // 新增背景模糊效果
+      'star-color': { label: '星星顏色', color: '#d1ffff', alpha: 0.8 },
       'bg-blur': { label: '背景模糊程度', color: '#000000', alpha: 8 },
-      // 新增背景變暗效果
-      'bg-darken': { label: '背景變暗程度', color: '#000000', alpha: 0.5 }
+      'bg-darken': { label: '背景變暗程度', color: '#000000', alpha: 0.5 },
+      'card-border': { label: '卡片邊框色', color: '#ffffff', alpha: 0.25 },
+      'prize-border': { label: '彈出卡片邊框色', color: '#ffb300', alpha: 1 }
     };
 
     let currentColors = JSON.parse(JSON.stringify(defaultColors));
@@ -331,7 +323,7 @@
       const label = document.createElement('div');
       label.className = 'color-label';
       // 加上編號
-      const itemIndex = Object.keys(currentColors).indexOf(key) + 1;
+      const itemIndex = activeKeys.indexOf(key) + 1;
       label.textContent = `#${itemIndex.toString().padStart(2, '0')} ${config.label}`;
       
       const controls = document.createElement('div');
@@ -435,7 +427,7 @@
       
       const label = document.createElement('div');
       label.className = 'color-label';
-      const itemIndex = Object.keys(currentColors).indexOf(key) + 1;
+      const itemIndex = activeKeys.indexOf(key) + 1;
       label.textContent = `#${itemIndex.toString().padStart(2, '0')} ${config.label}`;
       
       const controls = document.createElement('div');
@@ -546,19 +538,47 @@
     // 儲存主題
     function saveTheme() {
       localStorage.setItem('lotteryTheme', JSON.stringify(currentColors));
+      // 將 04-09 的 CSS 變數都設為 unused-black
+      const unusedColor = currentColors['unused-black']?.color || '#000000';
+      const unusedAlpha = currentColors['unused-black']?.alpha ?? 1;
+      const r = parseInt(unusedColor.substr(1,2),16);
+      const g = parseInt(unusedColor.substr(3,2),16);
+      const b = parseInt(unusedColor.substr(5,2),16);
+      const rgba = `rgba(${r},${g},${b},${unusedAlpha})`;
+      const unusedKeys = ['sub-bg','progress-red','text-sub','text-black','bg-dark','bg-darkblue'];
+      unusedKeys.forEach(key => {
+        document.documentElement.style.setProperty(`--${key}`, rgba);
+      });
       showStatus('主題已儲存！');
+    }
+
+    // 只渲染有作用的 key
+    const activeKeys = [
+      'main-bg','unused-black','card-bg','card-gold','btn-blue','btn-cyan','text-main','cursor-dot','cursor-shadow','card-orange','card-orange-light','card-orange-adv','shadow-cyan','border-cyan','border-cyan-light','text-cyan','text-main-card','card-danmu-bg','border-anim','prize-shine','progress-mask','progress-stripe','bubble-bg','bubble-text','music-btn','shine-color','cursor-bg','star-color','bg-blur','bg-darken','card-border','prize-border'
+    ];
+
+    // palette 渲染時只顯示 activeKeys
+    function renderPalette() {
+      const palette = document.getElementById('palette');
+      palette.innerHTML = '';
+      activeKeys.forEach(key => {
+        const config = currentColors[key];
+        if (config) {
+          const picker = createColorPicker(key, config);
+          palette.appendChild(picker);
+        }
+      });
     }
 
     // 載入主題
     function loadTheme() {
       const saved = localStorage.getItem('lotteryTheme');
       if (saved) {
-        // 合併 defaultColors，保證所有 key 都存在
+        // 只合併 activeKeys，保證所有 key 都存在
         const loaded = JSON.parse(saved);
         currentColors = {};
-        Object.keys(defaultColors).forEach(key => {
+        activeKeys.forEach(key => {
           if (loaded[key]) {
-            // 若有 label 變動也用新版
             currentColors[key] = {
               label: defaultColors[key].label,
               color: loaded[key].color,
@@ -570,11 +590,14 @@
         });
       } else {
         // 如果沒有儲存的主題，嘗試從 CSS 變數讀取當前設定
-        currentColors = JSON.parse(JSON.stringify(defaultColors));
+        currentColors = {};
+        activeKeys.forEach(key => {
+          currentColors[key] = JSON.parse(JSON.stringify(defaultColors[key]));
+        });
         
         try {
           const computedStyle = getComputedStyle(document.documentElement);
-          Object.keys(defaultColors).forEach(key => {
+          activeKeys.forEach(key => {
             const cssVar = computedStyle.getPropertyValue(`--${key}`);
             if (cssVar && cssVar.trim() !== '') {
               // 解析 rgba 值
@@ -640,7 +663,12 @@
 
     // 匯出設定
     function exportTheme() {
-      const dataStr = JSON.stringify(currentColors, null, 2);
+      // 只導出 activeKeys
+      const exportColors = {};
+      activeKeys.forEach(key => {
+        exportColors[key] = currentColors[key];
+      });
+      const dataStr = JSON.stringify(exportColors, null, 2);
       const dataBlob = new Blob([dataStr], {type: 'application/json'});
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
@@ -663,22 +691,15 @@
           reader.onload = (e) => {
             try {
               const imported = JSON.parse(e.target.result);
-              // 合併 defaultColors，保證所有 key 都存在
+              // 只合併 activeKeys
               currentColors = {};
-              Object.keys(defaultColors).forEach(key => {
+              activeKeys.forEach(key => {
                 if (imported[key]) {
                   currentColors[key] = {
                     label: defaultColors[key].label,
                     color: imported[key].color,
                     alpha: imported[key].alpha
                   };
-                  // 特殊處理背景效果
-                  if (key === 'bg-blur') {
-                    const blurValue = `${imported[key].alpha}px`;
-                    document.documentElement.style.setProperty('--bg-blur', blurValue);
-                  } else if (key === 'bg-darken') {
-                    document.documentElement.style.setProperty('--bg-darken', imported[key].alpha);
-                  }
                 } else {
                   currentColors[key] = JSON.parse(JSON.stringify(defaultColors[key]));
                 }
@@ -693,17 +714,6 @@
         }
       };
       input.click();
-    }
-
-    // 渲染調色盤
-    function renderPalette() {
-      const palette = document.getElementById('palette');
-      palette.innerHTML = '';
-      
-      Object.entries(currentColors).forEach(([key, config]) => {
-        const picker = createColorPicker(key, config);
-        palette.appendChild(picker);
-      });
     }
 
     // 初始化時先載入當前設定

@@ -1,0 +1,102 @@
+{
+  "main-bg": {
+    "label": "主背景色",
+    "color": "#ffffff",
+    "alpha": 0.9
+  },
+  "card-bg": {
+    "label": "卡片底色",
+    "color": "#ffbb00",
+    "alpha": 0.7
+  },
+  "card-orange": {
+    "label": "卡片高亮（橙）",
+    "color": "#eca222",
+    "alpha": 0.95
+  },
+  "card-orange-light": {
+    "label": "卡片高亮（橙，淡）",
+    "color": "#eb8500",
+    "alpha": 0.85
+  },
+  "card-orange-adv": {
+    "label": "卡片高亮（橙，進階）",
+    "color": "#000000",
+    "alpha": 0.9
+  },
+  "shadow-cyan": {
+    "label": "卡片陰影/按鈕hover",
+    "color": "#e894ff",
+    "alpha": 0.52
+  },
+  "border-cyan": {
+    "label": "卡片邊框/按鈕active",
+    "color": "#ff42cd",
+    "alpha": 0.17
+  },
+  "border-cyan-light": {
+    "label": "卡片邊框淡色",
+    "color": "#ff5ce1",
+    "alpha": 0.25
+  },
+  "text-cyan": {
+    "label": "卡片文字/按鈕文字",
+    "color": "#edd6ff",
+    "alpha": 0.75
+  },
+  "text-main-card": {
+    "label": "卡片主文字",
+    "color": "#ffe5fc",
+    "alpha": 0.85
+  },
+  "card-danmu-bg": {
+    "label": "卡片/彈幕底色",
+    "color": "#5c455e",
+    "alpha": 0.37
+  },
+  "border-anim": {
+    "label": "高亮動畫邊框",
+    "color": "#ff70fa",
+    "alpha": 1
+  },
+  "prize-shine": {
+    "label": "prize-shine 文字",
+    "color": "#edbefe",
+    "alpha": 1
+  },
+  "progress-mask": {
+    "label": "進度條背景/遮罩",
+    "color": "#b1207c",
+    "alpha": 0.25
+  },
+  "progress-stripe": {
+    "label": "進度條條紋",
+    "color": "#2eff89",
+    "alpha": 0.15
+  },
+  "bubble-bg": {
+    "label": "氣泡底色",
+    "color": "#c800ff",
+    "alpha": 0.25
+  },
+  "bubble-text": {
+    "label": "氣泡文字",
+    "color": "#ffffff",
+    "alpha": 0.75
+  },
+  "music-btn": {
+    "label": "音樂按鈕底色",
+    "color": "#472650",
+    "alpha": 0.9
+  },
+  "shine-color": {
+    "label": "卡片閃爍高亮色",
+    "color": "#6e4497",
+    "alpha": 0.57
+  },
+  "cursor-bg": {
+    "label": "游標底色",
+    "color": "#000000",
+    "alpha": 1
+  }
+}

@@ -81,6 +81,20 @@
     bgImg.src = './img/bg.jpeg';
   };
 
+  // 取得星星顏色（主色+動態alpha）
+  function getStarColor(alpha) {
+    const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--star-color').trim() || 'rgba(209,255,255,0.8)';
+    // 解析 rgba(r,g,b,a)
+    const match = cssColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (match) {
+      const r = parseInt(match[1]);
+      const g = parseInt(match[2]);
+      const b = parseInt(match[3]);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+    return `rgba(209,255,255,${alpha})`;
+  }
+
   function drawStars() {
     var pixelX, pixelY, pixelRadius;
 
@@ -149,7 +163,8 @@
       c.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    c.fillStyle = "rgba(209, 255, 255, " + radius + ")";
+    // c.fillStyle = "rgba(209, 255, 255, " + radius + ")";
+    c.fillStyle = getStarColor(radius);
     for (i = 0; i < numStars; i++) {
       star = stars[i];
 
@@ -160,7 +175,7 @@
       pixelRadius = 1 * (focalLength / star.z);
 
       c.fillRect(pixelX, pixelY, pixelRadius, pixelRadius);
-      c.fillStyle = "rgba(209, 255, 255, " + star.o + ")";
+      c.fillStyle = getStarColor(star.o);
       //c.fill();
     }
   }
