@@ -218,6 +218,8 @@
       'btn-blue': { label: '主按鈕（藍）', color: '#007bff', alpha: 1 },
       'btn-cyan': { label: '高亮按鈕（青）', color: '#17a2b8', alpha: 1 },
       'text-main': { label: '主文字色', color: '#222222', alpha: 1 },
+      'text-sub': { label: '次要文字色', color: '#333333', alpha: 1 },
+      'text-black': { label: '黑色文字', color: '#000000', alpha: 1 },
       'cursor-dot': { label: '自訂游標圓點', color: '#ffffff', alpha: 0.18 },
       'cursor-shadow': { label: '游標陰影', color: '#ffffff', alpha: 0.10 },
       'card-orange': { label: '卡片高亮（橙）', color: '#fd6900', alpha: 0.95 },
@@ -545,7 +547,8 @@
       const g = parseInt(unusedColor.substr(3,2),16);
       const b = parseInt(unusedColor.substr(5,2),16);
       const rgba = `rgba(${r},${g},${b},${unusedAlpha})`;
-      const unusedKeys = ['sub-bg','progress-red','text-sub','text-black','bg-dark','bg-darkblue'];
+      // 移除 text-black、text-sub，不再合併
+      const unusedKeys = ['sub-bg','progress-red','bg-dark','bg-darkblue'];
       unusedKeys.forEach(key => {
         document.documentElement.style.setProperty(`--${key}`, rgba);
       });
@@ -554,7 +557,7 @@
 
     // 只渲染有作用的 key
     const activeKeys = [
-      'main-bg','unused-black','card-bg','card-gold','btn-blue','btn-cyan','text-main','cursor-dot','cursor-shadow','card-orange','card-orange-light','card-orange-adv','shadow-cyan','border-cyan','border-cyan-light','text-cyan','text-main-card','card-danmu-bg','border-anim','prize-shine','progress-mask','progress-stripe','bubble-bg','bubble-text','music-btn','shine-color','cursor-bg','star-color','bg-blur','bg-darken','card-border','prize-border'
+      'main-bg','unused-black','card-bg','card-gold','btn-blue','btn-cyan','text-main','text-sub','text-black','cursor-dot','cursor-shadow','card-orange','card-orange-light','card-orange-adv','shadow-cyan','border-cyan','border-cyan-light','text-cyan','text-main-card','card-danmu-bg','border-anim','prize-shine','progress-mask','progress-stripe','bubble-bg','bubble-text','music-btn','shine-color','cursor-bg','star-color','bg-blur','bg-darken','card-border','prize-border'
     ];
 
     // palette 渲染時只顯示 activeKeys

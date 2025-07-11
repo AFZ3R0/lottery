@@ -556,11 +556,71 @@ function animate() {
   // render();
 }
 
-function render() {
-  renderer.render(scene, camera);
+// 在 body 加入顯示球體像素半徑的 div（只加一次）
+if (!document.getElementById('sphere-size-info')) {
+  const infoDiv = document.createElement('div');
+  infoDiv.id = 'sphere-size-info';
+  infoDiv.style.position = 'fixed';
+  infoDiv.style.top = '12px';
+  infoDiv.style.right = '24px';
+  infoDiv.style.zIndex = '9999';
+  infoDiv.style.background = 'rgba(0,0,0,0.6)';
+  infoDiv.style.color = '#fff';
+  infoDiv.style.fontSize = '16px';
+  infoDiv.style.padding = '6px 16px';
+  infoDiv.style.borderRadius = '8px';
+  infoDiv.style.pointerEvents = 'none';
+  document.body.appendChild(infoDiv);
 }
 
-function selectCard(duration = 600) {
+// 控制是否顯示球體螢幕半徑除錯資訊
+const SHOW_SPHERE_DEBUG = false;
+
+function render() {
+  renderer.render(scene, camera);
+
+  const infoDiv = document.getElementById('sphere-size-info');
+  if (!SHOW_SPHERE_DEBUG && infoDiv) {
+    infoDiv.style.display = 'none';
+    return;
+  }
+  if (
+    camera &&
+    renderer &&
+    renderer.domElement &&
+    typeof THREE !== 'undefined'
+  ) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    if (width > 0 && height > 0) {
+      const center = new THREE.Vector3(0, 0, 0);
+      const r = 800 * (typeof Resolution !== 'undefined' ? Resolution : 1);
+      const surface = new THREE.Vector3(r, 0, 0);
+      center.project(camera);
+      surface.project(camera);
+      const centerX = (center.x + 1) / 2 * width;
+      const centerY = (1 - center.y) / 2 * height;
+      const surfaceX = (surface.x + 1) / 2 * width;
+      const surfaceY = (1 - surface.y) / 2 * height;
+      const pixelRadius = Math.sqrt(Math.pow(surfaceX - centerX, 2) + Math.pow(surfaceY - centerY, 2));
+      if (isFinite(pixelRadius)) {
+        infoDiv.textContent = `球體螢幕半徑: ${pixelRadius.toFixed(1)} px`;
+      } else {
+        infoDiv.textContent = `球體螢幕半徑: 無法取得`;
+      }
+      infoDiv.style.display = 'block';
+    } else {
+      infoDiv.textContent = `球體螢幕半徑: 無法取得`;
+      infoDiv.style.display = 'block';
+    }
+  } else if (infoDiv) {
+    infoDiv.textContent = `球體螢幕半徑: 無法取得`;
+    infoDiv.style.display = 'block';
+  }
+}
+
+function selectCard(duration = 400) {
   rotate = false;
   let width = 140,
     tag = -(currentLuckys.length - 1) / 2,
