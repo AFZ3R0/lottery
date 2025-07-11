@@ -241,7 +241,7 @@ button:active {
 }
 
 .prize-list {
-  padding: 1.5vh 0 0 1.5vh;
+  padding: 1.5vh 1.5vh 1.5vh 1.5vh;
   margin: 0;
   list-style: none;
   position: relative;
