@@ -206,7 +206,6 @@ function showPrizeList(currentPrizeIndex) {
                     </li>`;
   });
   htmlCode += `</ul>`;
-  htmlCode += `</div>`;
 
   document.querySelector("#prizeBar").innerHTML = htmlCode;
   // 先觸發動畫，再自動滾動到正在抽的獎品

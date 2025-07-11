@@ -241,12 +241,13 @@ button:active {
 }
 
 .prize-list {
+  padding: 1.5vh 0 0 1.5vh;
   margin: 0;
-  padding: 0;
   list-style: none;
   position: relative;
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: visible;
 }
 
 .prize-list::-webkit-scrollbar {
@@ -630,4 +631,10 @@ button:active {
     transform: scale(0.9);
     opacity: 0.8;
   }
+}
+
+.prize-item,
+.done,
+.blur {
+  transform-origin: left center;
 }
