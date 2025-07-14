@@ -461,34 +461,44 @@ function addHighlight() {
  */
 function transform(targets, duration) {
   // TWEEN.removeAll();
-  for (var i = 0; i < threeDCards.length; i++) {
-    var object = threeDCards[i];
-    var target = targets[i];
+  const batchSize = 10;
+  let batchIndex = 0;
+  function animateBatch() {
+    const start = batchIndex * batchSize;
+    const end = Math.min(start + batchSize, threeDCards.length);
+    for (let i = start; i < end; i++) {
+      var object = threeDCards[i];
+      var target = targets[i];
+      new TWEEN.Tween(object.position)
+        .to(
+          {
+            x: target.position.x,
+            y: target.position.y,
+            z: target.position.z
+          },
+          Math.random() * duration + duration
+        )
+        .easing(TWEEN.Easing.Exponential.InOut)
+        .start();
 
-    new TWEEN.Tween(object.position)
-      .to(
-        {
-          x: target.position.x,
-          y: target.position.y,
-          z: target.position.z
-        },
-        Math.random() * duration + duration
-      )
-      .easing(TWEEN.Easing.Exponential.InOut)
-      .start();
-
-    new TWEEN.Tween(object.rotation)
-      .to(
-        {
-          x: target.rotation.x,
-          y: target.rotation.y,
-          z: target.rotation.z
-        },
-        Math.random() * duration + duration
-      )
-      .easing(TWEEN.Easing.Exponential.InOut)
-      .start();
+      new TWEEN.Tween(object.rotation)
+        .to(
+          {
+            x: target.rotation.x,
+            y: target.rotation.y,
+            z: target.rotation.z
+          },
+          Math.random() * duration + duration
+        )
+        .easing(TWEEN.Easing.Exponential.InOut)
+        .start();
+    }
+    batchIndex++;
+    if (end < threeDCards.length) {
+      setTimeout(animateBatch, 20);
+    }
   }
+  animateBatch();
 
   new TWEEN.Tween(this)
     .to({}, duration * 2)
@@ -669,44 +679,55 @@ function selectCard(duration = 400) {
 
   // 根據得獎個數決定Z值
   const zValue = currentLuckys.length > 1 ? 2350 : 2500;
-  
-  selectedCardIndex.forEach((cardIndex, index) => {
-    changeCard(cardIndex, currentLuckys[index]);
-    var object = threeDCards[cardIndex];
-    new TWEEN.Tween(object.position)
-      .to(
-        {
-          x: locates[index].x,
-          y: locates[index].y * Resolution,
-          z: zValue
-        },
-        Math.random() * duration + duration
-      )
-      .easing(TWEEN.Easing.Exponential.InOut)
-      .start();
 
-    new TWEEN.Tween(object.rotation)
-      .to(
-        {
-          x: 0,
-          y: 0,
-          z: 0
-        },
-        Math.random() * duration + duration
-      )
-      .easing(TWEEN.Easing.Exponential.InOut)
-      .start();
+  // 分批啟動動畫
+  const batchSize = 10;
+  let batchIndex = 0;
+  function animateBatch() {
+    const start = batchIndex * batchSize;
+    const end = Math.min(start + batchSize, selectedCardIndex.length);
+    for (let i = start; i < end; i++) {
+      const cardIndex = selectedCardIndex[i];
+      changeCard(cardIndex, currentLuckys[i]);
+      var object = threeDCards[cardIndex];
+      new TWEEN.Tween(object.position)
+        .to(
+          {
+            x: locates[i].x,
+            y: locates[i].y * Resolution,
+            z: zValue
+          },
+          Math.random() * duration + duration
+        )
+        .easing(TWEEN.Easing.Exponential.InOut)
+        .start();
 
-    object.element.classList.add("prize");
-    tag++;
-  });
+      new TWEEN.Tween(object.rotation)
+        .to(
+          {
+            x: 0,
+            y: 0,
+            z: 0
+          },
+          Math.random() * duration + duration
+        )
+        .easing(TWEEN.Easing.Exponential.InOut)
+        .start();
 
+      object.element.classList.add("prize");
+    }
+    batchIndex++;
+    if (end < selectedCardIndex.length) {
+      setTimeout(animateBatch, 20);
+    }
+  }
+  animateBatch();
+  // ...原本的 TWEEN 結束後觸發 setLotteryStatus
   new TWEEN.Tween(this)
     .to({}, duration * 2)
     .onUpdate(render)
     .start()
     .onComplete(() => {
-      // 動畫結束後可以操作
       setLotteryStatus();
     });
 }
@@ -769,7 +790,7 @@ function resetCard(duration = 500) {
 function lottery() {
   // if (isLotting) {
   //   rotateObj.stop();
-  //   btns.lottery.innerHTML = "開始抽獎";
+  //   btns.lottery.innerHTML = "結束抽獎";
   //   return;
   // }
   btns.lottery.innerHTML = "結束抽獎";

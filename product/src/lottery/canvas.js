@@ -16,7 +16,11 @@
 
   var c = canvas.getContext("2d");
 
-  var numStars = 800;
+  var numStars = 400;
+  var initialStars = 100;
+  var starsIncrement = 50;
+  var starsIncrementInterval = 100; // ms
+  var starsTarget = numStars;
   var radius = "0." + Math.floor(Math.random() * 9) + 1;
   var focalLength = canvas.width * 2;
   var warp = 0;
@@ -58,7 +62,7 @@
   function moveStars() {
     for (i = 0; i < numStars; i++) {
       star = stars[i];
-      star.z--;
+      star.z -= 1.5;
 
       if (star.z <= 0) {
         star.z = canvas.width;
@@ -80,6 +84,40 @@
     // 嘗試其他路徑
     bgImg.src = './img/bg.jpeg';
   };
+
+  // 讀取主題設定的目標值
+  var targetBlur = parseFloat(localStorage.getItem('bgBlurValue')) || 8;
+  var targetDarken = localStorage.getItem('bgDarkenValue') !== null ? parseFloat(localStorage.getItem('bgDarkenValue')) : 0.5;
+  // 初始值
+  var currentBlur = 0;
+  var currentDarken = 1; // 先設最暗
+  var blurAnimStart = null;
+  var blurAnimDuration = 2000; // 2秒
+  var blurAnimDelay = 5000; // 5秒延遲
+  var blurAnimRunning = false;
+
+  setTimeout(function() {
+    // 5秒後，模糊值直接到主題設定值
+    currentBlur = targetBlur;
+    // 變暗值開始漸進
+    blurAnimRunning = true;
+    blurAnimStart = performance.now();
+    requestAnimationFrame(darkenAnimStep);
+  }, blurAnimDelay);
+
+  function darkenAnimStep(now) {
+    if (!blurAnimRunning) return;
+    var elapsed = now - blurAnimStart;
+    var t = Math.min(elapsed / blurAnimDuration, 1);
+    // 只漸進變暗值
+    currentDarken = 1 + (targetDarken - 1) * t;
+    if (t < 1) {
+      requestAnimationFrame(darkenAnimStep);
+    } else {
+      blurAnimRunning = false;
+      currentDarken = targetDarken;
+    }
+  }
 
   // 取得星星顏色（主色+動態alpha）
   function getStarColor(alpha) {
@@ -113,15 +151,18 @@
       // console.log('繪製背景圖');
       c.save();
       
+      // 使用動畫中的 currentBlur/currentDarken
+      c.filter = `blur(${currentBlur}px)`;
+      
       // 從 localStorage 讀取值，如果沒有則使用預設值
-      const blurValue = localStorage.getItem('bgBlurValue') || '8px';
-      const darkenValue = localStorage.getItem('bgDarkenValue') !== null ? parseFloat(localStorage.getItem('bgDarkenValue')) : 0.5;
+      // const blurValue = localStorage.getItem('bgBlurValue') || '8px';
+      // const darkenValue = localStorage.getItem('bgDarkenValue') !== null ? parseFloat(localStorage.getItem('bgDarkenValue')) : 0.5;
       
       // console.log('使用的模糊值:', blurValue);
       // console.log('使用的變暗值:', darkenValue, '類型:', typeof darkenValue);
       // console.log('變暗值是否大於 0:', darkenValue > 0);
       
-      c.filter = `blur(${blurValue})`;
+      // c.filter = `blur(${blurValue})`;
       
       // 讓圖片寬度自動，高度等於canvas
       var imgRatio = bgImg.width / bgImg.height;
@@ -144,13 +185,13 @@
       c.restore();
       c.filter = 'none';
 
-      // 應用變暗效果（只有當變暗值大於 0 時才應用）
-      // console.log('準備應用變暗效果，值為:', darkenValue);
-      if (darkenValue > 0) {
+      // 應用變暗效果
+      if (currentDarken > 0) {
+        // console.log('準備應用變暗效果，值為:', darkenValue);
         // console.log('應用變暗效果');
         c.save();
         c.globalCompositeOperation = 'multiply';
-        c.globalAlpha = darkenValue;
+        c.globalAlpha = currentDarken;
         c.fillStyle = '#000';
         c.fillRect(0, 0, canvas.width, canvas.height);
         c.restore();
