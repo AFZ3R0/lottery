@@ -73,7 +73,7 @@
   var bgLoaded = false;
   bgImg.onload = function() {
     bgLoaded = true;
-    console.log('背景圖載入成功');
+    // console.log('背景圖載入成功');
   };
   bgImg.onerror = function() {
     console.error('背景圖載入失敗，嘗試其他路徑');
@@ -110,16 +110,16 @@
 
     // 先畫模糊背景圖
     if (bgLoaded) {
-      console.log('繪製背景圖');
+      // console.log('繪製背景圖');
       c.save();
       
       // 從 localStorage 讀取值，如果沒有則使用預設值
       const blurValue = localStorage.getItem('bgBlurValue') || '8px';
       const darkenValue = localStorage.getItem('bgDarkenValue') !== null ? parseFloat(localStorage.getItem('bgDarkenValue')) : 0.5;
       
-      console.log('使用的模糊值:', blurValue);
-      console.log('使用的變暗值:', darkenValue, '類型:', typeof darkenValue);
-      console.log('變暗值是否大於 0:', darkenValue > 0);
+      // console.log('使用的模糊值:', blurValue);
+      // console.log('使用的變暗值:', darkenValue, '類型:', typeof darkenValue);
+      // console.log('變暗值是否大於 0:', darkenValue > 0);
       
       c.filter = `blur(${blurValue})`;
       
@@ -145,9 +145,9 @@
       c.filter = 'none';
 
       // 應用變暗效果（只有當變暗值大於 0 時才應用）
-      console.log('準備應用變暗效果，值為:', darkenValue);
+      // console.log('準備應用變暗效果，值為:', darkenValue);
       if (darkenValue > 0) {
-        console.log('應用變暗效果');
+        // console.log('應用變暗效果');
         c.save();
         c.globalCompositeOperation = 'multiply';
         c.globalAlpha = darkenValue;
@@ -155,10 +155,10 @@
         c.fillRect(0, 0, canvas.width, canvas.height);
         c.restore();
       } else {
-        console.log('跳過變暗效果（值為 0 或負數）');
+        // console.log('跳過變暗效果（值為 0 或負數）');
       }
     } else {
-      console.log('背景圖未載入');
+      // console.log('背景圖未載入');
       // 沒有圖片時用透明
       c.clearRect(0, 0, canvas.width, canvas.height);
     }

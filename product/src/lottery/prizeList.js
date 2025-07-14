@@ -129,36 +129,37 @@ class Qipao {
   }
 }
 
-let addQipao = (() => {
-  let qipaoList = [];
-  return function (text) {
-    let qipao;
-    if (qipaoList.length > 0) {
-      qipao = qipaoList.shift();
-    } else {
-      qipao = new Qipao({
-        onComplete() {
-          qipaoList.push(qipao);
-        }
-      });
-    }
+// 停用氣泡提示
+let addQipao = () => {};
 
-    qipao.start(text);
-  };
-})();
+// 名額顯示對應表，type=0 顯示 ???，其他顯示 count
+let prizeQuotaMap = {};
+function updatePrizeQuotaMap() {
+  prizeQuotaMap = {};
+  if (!prizes) return;
+  prizes.forEach(item => {
+    prizeQuotaMap[item.type] = (item.type === 0) ? "???" : item.count;
+  });
+}
 
 function setPrizes(pri) {
   prizes = pri;
   defaultType = prizes[0]["type"];
   lasetPrizeIndex = pri.length - 1;
+  updatePrizeQuotaMap();
 }
 
 function showPrizeList(currentPrizeIndex) {
+  updatePrizeQuotaMap();
   let currentPrize = prizes[currentPrizeIndex];
-  if (currentPrize.type === defaultType) {
-    currentPrize.count === "不限制";
-  }
-  let htmlCode = `<div class="prize-mess">正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>，剩余<label id="prizeLeft" class="prize-shine">${currentPrize.count}</label>个</div>`;
+  // 只有 type>0 時才顯示名額
+  let showQuota = currentPrize.type > 0;
+  let quotaText = prizeQuotaMap[currentPrize.type];
+  let unitText = "個";
+  let leftText = currentPrize.type === 0 ? "???" : quotaText;
+  let quotaBlock = showQuota ? `<span id="prizeQuotaBlock">，名額<label class="prize-shine">${quotaText}</label>${unitText}</span>` : "";
+  console.log('[showPrizeList] type:', currentPrize.type, 'quotaBlock:', quotaBlock);
+  let htmlCode = `<div class="prize-mess">正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>${quotaBlock}<label id="prizeLeft" style="display:none">${leftText}</label></div>`;
   htmlCode += `<ul class="prize-list">`;
   let total = prizes.length;
   let center = currentPrizeIndex;
@@ -178,7 +179,7 @@ function showPrizeList(currentPrizeIndex) {
     let cls = "prize-item";
     if (idx === currentPrizeIndex) {
       cls += " shine";
-    } else if (/*已抽判斷*/ window.basicData && window.basicData.luckyUsers && (window.basicData.luckyUsers[item.type]||[]).length >= item.count) {
+    } else if (window.basicData && window.basicData.luckyUsers && (window.basicData.luckyUsers[item.type]||[]).length >= item.count) {
       cls += " done";
     } else if ((window.basicData && window.basicData.luckyUsers && (window.basicData.luckyUsers[item.type]||[]).length === 0)) {
       cls += " blur";
@@ -208,8 +209,12 @@ function showPrizeList(currentPrizeIndex) {
   htmlCode += `</ul>`;
 
   document.querySelector("#prizeBar").innerHTML = htmlCode;
-  // 先觸發動畫，再自動滾動到正在抽的獎品
+  // 強制清理多餘 .prize-mess
   setTimeout(() => {
+    const messList = document.querySelectorAll('.prize-mess');
+    if (messList.length > 1) {
+      for (let i = 1; i < messList.length; i++) messList[i].remove();
+    }
     const list = document.querySelector('.prize-list');
     const shine = list && list.querySelector('.shine');
     if (shine && list) {
@@ -223,14 +228,20 @@ function resetPrize(currentPrizeIndex) {
   prizeElement = {};
   lasetPrizeIndex = currentPrizeIndex;
   showPrizeList(currentPrizeIndex);
+  // 強制刷新名額顯示，確保 type=0 時顯示 ??? 個
+  if (typeof setPrizeData === 'function') {
+    setPrizeData(currentPrizeIndex, 0, true);
+  }
 }
 
 let setPrizeData = (function () {
   return function (currentPrizeIndex, count, isInit) {
+    updatePrizeQuotaMap();
     let currentPrize = prizes[currentPrizeIndex],
       type = currentPrize.type,
       elements = prizeElement[type],
       totalCount = currentPrize.count;
+    console.log('[setPrizeData] type:', type, 'count:', totalCount, 'isInit:', isInit);
 
     if (!elements) {
       elements = {
@@ -252,9 +263,16 @@ let setPrizeData = (function () {
         let type = prizes[i]["type"];
         document.querySelector(`#prize-item-${type}`).className =
           "prize-item done";
-        document.querySelector(`#prize-bar-${type}`).style.width = "0";
-        document.querySelector(`#prize-count-${type}`).textContent =
-          "0" + "/" + prizes[i]["count"];
+        // type=0 顯示 ???/???，進度條 100%
+        if (prizes[i]["type"] === 0) {
+          document.querySelector(`#prize-bar-${type}`).style.width = "100%";
+          document.querySelector(`#prize-count-${type}`).textContent =
+            "???/???";
+        } else {
+          document.querySelector(`#prize-bar-${type}`).style.width = "0";
+          document.querySelector(`#prize-count-${type}`).textContent =
+            "0" + "/" + prizes[i]["count"];
+        }
       }
     }
 
@@ -279,10 +297,16 @@ let setPrizeData = (function () {
       lasetPrizeIndex = currentPrizeIndex;
     }
 
-    if (currentPrizeIndex === 0) {
-      prizeElement.prizeType.textContent = "特别奖";
-      prizeElement.prizeText.textContent = " ";
-      prizeElement.prizeLeft.textContent = "不限制";
+    // type=0 特別獎，名額顯示 ??? 個，進度條 100%
+    if (currentPrize.type === 0) {
+      prizeElement.prizeType.textContent = currentPrize.text;
+      prizeElement.prizeText.textContent = currentPrize.title;
+      prizeElement.prizeLeft.textContent = "???";
+      elements.text && (elements.text.textContent = "???/???");
+      elements.bar && (elements.bar.style.width = "100%");
+      // quotaBlock 顯示 ??? 個
+      let quotaBlockEl = document.getElementById('prizeQuotaBlock');
+      if (quotaBlockEl) quotaBlockEl.innerHTML = `，名額<label class=\"prize-shine\">???</label>個`;
       return;
     }
 
@@ -292,6 +316,11 @@ let setPrizeData = (function () {
     elements.bar && (elements.bar.style.width = percent * 100 + "%");
     elements.text && (elements.text.textContent = count + "/" + totalCount);
     prizeElement.prizeLeft.textContent = count;
+    // quotaBlock 動態刷新
+    let quotaBlockEl = document.getElementById('prizeQuotaBlock');
+    if (quotaBlockEl) {
+      quotaBlockEl.innerHTML = `，名額<label class="prize-shine">${totalCount}</label>個`;
+    }
   };
 })();
 

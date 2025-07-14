@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>開始抽獎</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, var(--bg-dark, #000000) 0%, var(--bg-darkblue, #666666) 100%);
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+    }
+    .start-text {
+      color: #fff;
+      font-size: 5rem;
+      font-weight: bold;
+      letter-spacing: 0.2em;
+      text-align: center;
+      text-shadow: 0 2px 48px #000, 0 0 80px var(--shadow-cyan, rgba(0,255,255,0.5)), 0 0 32px var(--shadow-cyan, rgba(0,255,255,0.5));
+      border-radius: 16px;
+      padding: 32px 64px;
+      background: rgba(0,0,0,0.18);
+      transition: transform 0.2s;
+    }
+    .start-text:active {
+      transform: scale(0.97);
+    }
+  </style>
+  <script>
+    // 只同步#22（shadow-cyan）主題色
+    (function syncShadowCyan() {
+      const theme = localStorage.getItem('lotteryTheme');
+      if (theme) {
+        try {
+          const colors = JSON.parse(theme);
+          const conf = colors['shadow-cyan'];
+          if (conf && conf.color) {
+            const { color, alpha } = conf;
+            const r = parseInt(color.substr(1,2),16);
+            const g = parseInt(color.substr(3,2),16);
+            const b = parseInt(color.substr(5,2),16);
+            const rgba = `rgba(${r},${g},${b},${alpha})`;
+            document.documentElement.style.setProperty('--shadow-cyan', rgba);
+          }
+        } catch(e) {}
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="start-text">開始抽獎</div>
+  <script>
+    document.body.addEventListener('click', function() {
+      window.location.href = 'http://localhost:9000';
+    });
+  </script>
+</body>
+</html> 

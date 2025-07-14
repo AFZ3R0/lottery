@@ -43,6 +43,7 @@ if (process.argv.length > 2) {
 }
 
 app.use(express.static(cwd));
+app.use(express.static(path.join(__dirname, '../product/src/lottery')));
 
 //请求地址为空，默认重定向到index.html文件
 app.get("/", (req, res) => {

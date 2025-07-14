@@ -17,14 +17,14 @@ const prizes = [
     type: 1,
     count: 1,
     text: "頭獎",
-    title: "Samsung   Galaxy Z Fold7",
+    title: "Samsung Galaxy Z Fold7",
     img: "../img/pz01.png"
   },
   {
     type: 2,
     count: 3,
     text: "二獎",
-    title: "富衛 1881 公館酒店富尚套房住宿一晚   ",
+    title: "富衛 1881 公館酒店富尚套房住宿一晚",
     img: "../img/pz02.png"
   },
   {
@@ -73,7 +73,7 @@ const prizes = [
     type: 9,
     count: 2,
     text: "八獎",
-    title: "AXA Wine (Domaine de L'Arlot  Clos de L'Arlot 2020)",
+    title: "AXA Wine (Domaine de L'Arlot Clos de L'Arlot 2020)",
     img: "../img/pz09.png"
   },
   {

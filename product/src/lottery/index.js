@@ -260,6 +260,10 @@ function bindEvent() {
         setLotteryStatus(true);
         saveData();
         changePrize();
+        // 強制刷新名額顯示，確保 type=0 時顯示 ??? 個
+        if (typeof setPrizeData === 'function') {
+          setPrizeData(currentPrizeIndex, 0, true);
+        }
         resetCard().then(res => {
           lottery();
         });

@@ -288,12 +288,10 @@ button:active {
 }
 
 .prize-img img {
-  width: 90%;
-  height: 90%;
-  position: relative;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: static;
 }
 
 .prize-text {
@@ -637,4 +635,9 @@ button:active {
 .done,
 .blur {
   transform-origin: left center;
+}
+
+#save, #reset {
+  opacity: 0.02;
+  transition: opacity 0.2s;
 }
