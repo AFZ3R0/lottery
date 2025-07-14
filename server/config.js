@@ -15,80 +15,80 @@ const prizes = [
   },
   {
     type: 1,
-    count: 2,
-    text: "特等獎",
-    title: "神秘大禮",
-    img: "../img/secrit.jpg"
+    count: 1,
+    text: "頭獎",
+    title: "Samsung   Galaxy Z Fold7",
+    img: "../img/pz01.png"
   },
   {
     type: 2,
-    count: 5,
-    text: "一等獎",
-    title: "Mac Pro",
-    img: "../img/mbp.jpg"
+    count: 3,
+    text: "二獎",
+    title: "富衛 1881 公館酒店富尚套房住宿一晚   ",
+    img: "../img/pz02.png"
   },
   {
     type: 3,
-    count: 6,
-    text: "二等獎",
-    title: "華為 Mate30",
-    img: "../img/huawei.png"
+    count: 1,
+    text: "三獎",
+    title: "旅遊禮券港幣$5,000",
+    img: "../img/pz03.png"
   },
   {
     type: 4,
-    count: 7,
-    text: "三等獎",
-    title: "Ipad Mini5",
-    img: "../img/ipad.jpg"
+    count: 3,
+    text: "四獎",
+    title: "Market Place惠康禮券港幣$1,000",
+    img: "../img/pz04.png"
   },
   {
     type: 5,
-    count: 8,
-    text: "四等獎",
-    title: "大疆無人機",
-    img: "../img/spark.jpg"
+    count: 3,
+    text: "五獎",
+    title: "Market Place惠康禮券港幣$1,000",
+    img: "../img/pz05.png"
   },
   {
     type: 6,
-    count: 8,
-    text: "五等獎",
-    title: "Kindle",
-    img: "../img/kindle.jpg"
+    count: 3,
+    text: "五獎",
+    title: "百佳禮券港幣$1,000",
+    img: "../img/pz06.png"
   },
   {
     type: 7,
-    count: 11,
-    text: "六等獎",
-    title: "漫步者藍牙耳機",
-    img: "../img/edifier.jpg"
+    count: 1,
+    text: "六獎",
+    title: "中銀人壽十二生肖清酒杯套裝",
+    img: "../img/pz07.png"
   },
   {
     type: 8,
-    count: 1,
-    text: "二等獎",
-    title: "華為 Mate30",
-    img: "../img/huawei.png"
+    count: 2,
+    text: "七獎",
+    title: "金運福船",
+    img: "../img/pz08.png"
   },
   {
     type: 9,
-    count: 1,
-    text: "二等獎",
-    title: "華為 Mate30",
-    img: "../img/huawei.png"
+    count: 2,
+    text: "八獎",
+    title: "AXA Wine (Domaine de L'Arlot  Clos de L'Arlot 2020)",
+    img: "../img/pz09.png"
   },
   {
     type: 10,
-    count: 1,
-    text: "二等獎",
-    title: "華為 Mate30",
-    img: "../img/huawei.png"
+    count: 2,
+    text: "九獎",
+    title: "頂級海味珍饌福袋",
+    img: "../img/pz10.png"
   }
 ];
 
 /**
  * 一次抽取的獎品個數與prizes對應
  */
-const EACH_COUNT = [1, 1, 5, 6, 7, 8, 9, 10,1,1,1];
+const EACH_COUNT = [1, 1, 3, 1, 3, 3, 3, 1, 2, 2, 2];
 
 /**
  * 卡片公司名稱標識
