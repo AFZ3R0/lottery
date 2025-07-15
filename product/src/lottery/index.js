@@ -1061,10 +1061,6 @@ window.onload = function () {
     },
     false
   );
-
-  setTimeout(function () {
-    musicBox.click();
-  }, 1000);
 };
 
 // Custom cursor (semi-transparent dot)

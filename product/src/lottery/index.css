@@ -576,6 +576,11 @@ button:active {
   cursor: pointer;
   background-color: var(--music-btn, rgba(253,105,0,0.9));
   border: 1px solid var(--progress-stripe, rgba(255,255,255,0.5));
+  opacity: 0.05;
+  transition: opacity 0.3s;
+}
+.music-box:hover {
+  opacity: 1;
 }
 
 .rotate-active {
