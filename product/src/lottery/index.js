@@ -6,7 +6,8 @@ import {
   setPrizes,
   showPrizeList,
   setPrizeData,
-  resetPrize
+  resetPrize,
+  startMaoPao
 } from "./prizeList";
 import { NUMBER_MATRIX } from "./config.js";
 
@@ -63,6 +64,211 @@ initAll();
  * 初始化所有DOM
  */
 function initAll() {
+  // 隱藏主介面，顯示讀條
+  document.getElementById("container").style.display = "none";
+  document.getElementById("menu").style.display = "none";
+  
+  // 建立讀條介面
+  const loadingDiv = document.createElement('div');
+  loadingDiv.id = 'loading-screen';
+  loadingDiv.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom, var(--bg-dark, #000000) 0%, var(--bg-darkblue, #666666) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  `;
+  
+  const loadingText = document.createElement('div');
+  loadingText.textContent = '正在初始化抽獎系統...';
+  loadingText.style.cssText = `
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px var(--shadow-cyan, rgba(0,255,255,0.5));
+  `;
+  
+  const progressBar = document.createElement('div');
+  progressBar.style.cssText = `
+    width: 400px;
+    height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-cyan, rgba(127,255,255,0.25));
+  `;
+  
+  const progressFill = document.createElement('div');
+  progressFill.style.cssText = `
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--shadow-cyan, rgba(0,255,255,0.5)), var(--border-cyan, rgba(127,255,255,0.75)));
+    transition: width 0.3s ease;
+  `;
+  
+  progressBar.appendChild(progressFill);
+  loadingDiv.appendChild(loadingText);
+  loadingDiv.appendChild(progressBar);
+  document.body.appendChild(loadingDiv);
+  
+  // 分批初始化函數
+  function initCardsBatch(batchSize = 10, currentIndex = 0) {
+    const totalCards = ROW_COUNT * COLUMN_COUNT;
+    const endIndex = Math.min(currentIndex + batchSize, totalCards);
+    
+    for (let i = currentIndex; i < endIndex; i++) {
+      const row = Math.floor(i / COLUMN_COUNT);
+      const col = i % COLUMN_COUNT;
+      const isBold = HIGHLIGHT_CELL.includes(col + "-" + row);
+      const memberIndex = i % basicData.users.length;
+      
+      var element = createCard(
+        basicData.users[memberIndex],
+        isBold,
+        i,
+        basicData.leftUsers.length === basicData.users.length // 根據狀態決定是否顯示高亮
+      );
+
+      var object = new THREE.CSS3DObject(element);
+      // 恢復原本的散亂初始位置
+      object.position.x = Math.random() * 4000 - 2000;
+      object.position.y = Math.random() * 4000 - 2000;
+      object.position.z = Math.random() * 4000 - 2000;
+      scene.add(object);
+      threeDCards.push(object);
+
+      var targetObject = new THREE.Object3D();
+      targetObject.position.x = col * 140 - ((140 * COLUMN_COUNT - 20) / 2);
+      targetObject.position.y = -(row * 180) + ((180 * ROW_COUNT - 20) / 2);
+      targets.table.push(targetObject);
+    }
+    
+    // 更新進度條
+    const progress = (endIndex / totalCards) * 100;
+    progressFill.style.width = progress + '%';
+    
+    if (endIndex < totalCards) {
+      setTimeout(() => initCardsBatch(batchSize, endIndex), 10);
+    } else {
+      // 初始化完成，建立球體目標
+      initSphereTargets();
+      // 隱藏讀條，顯示主介面
+      setTimeout(() => {
+        document.body.removeChild(loadingDiv);
+        document.getElementById("container").style.display = "block";
+        document.getElementById("menu").style.display = "block";
+        // 開始動畫循環
+        animate();
+        // 暫時註解彈幕動畫，避免卡頓
+        // startMaoPao();
+        
+        // 確保資料已載入後再啟動閃爍效果
+        if (basicData.users && basicData.users.length > 0 && basicData.leftUsers && basicData.leftUsers.length > 0) {
+          console.log('[初始化完成] 啟動卡片閃爍效果，用戶數:', basicData.users.length, '剩餘用戶數:', basicData.leftUsers.length);
+          shineCard();
+        } else {
+          console.warn('[初始化完成] 用戶資料未完全載入，延遲啟動閃爍效果');
+          // 延遲啟動閃爍效果
+          setTimeout(() => {
+            if (basicData.users && basicData.users.length > 0 && basicData.leftUsers && basicData.leftUsers.length > 0) {
+              console.log('[延遲啟動] 啟動卡片閃爍效果');
+              shineCard();
+            } else {
+              console.error('[延遲啟動] 用戶資料仍未載入，無法啟動閃爍效果');
+            }
+          }, 2000);
+        }
+        
+        // 根據狀態決定初始畫面
+        const showTable = basicData.leftUsers.length === basicData.users.length;
+        console.log('[初始化完成] 狀態檢查:', {
+          leftUsers: basicData.leftUsers.length,
+          totalUsers: basicData.users.length,
+          showTable: showTable
+        });
+        
+        if (showTable) {
+          // 顯示數字牆
+          console.log('[初始化完成] 準備轉換到數字牆');
+          setTimeout(() => {
+            console.log('[轉換開始] 執行 transform(targets.table, 2000)');
+            transform(targets.table, 2000);
+            // 轉換完成後設置高亮狀態 - 移除，因為卡片在創建時已經設置了正確的高亮狀態
+            // setTimeout(() => {
+            //   console.log('[轉換完成] 設置高亮狀態');
+            //   addHighlight();
+            // }, 2500);
+          }, 500);
+        } else {
+          // 顯示球體
+          console.log('[初始化完成] 準備轉換到球體');
+          setTimeout(() => {
+            console.log('[轉換開始] 執行 transform(targets.sphere, 2000)');
+            transform(targets.sphere, 2000);
+          }, 500);
+        }
+        
+        // 確保渲染開始
+        render();
+      }, 500);
+    }
+  }
+  
+  // 初始化球體目標
+  function initSphereTargets() {
+    var vector = new THREE.Vector3();
+    for (var i = 0, l = threeDCards.length; i < l; i++) {
+      var phi = Math.acos(-1 + (2 * i) / l);
+      var theta = Math.sqrt(l * Math.PI) * phi;
+      var object = new THREE.Object3D();
+      object.position.setFromSphericalCoords(800 * Resolution, phi, theta);
+      vector.copy(object.position).multiplyScalar(2);
+      object.lookAt(vector);
+      targets.sphere.push(object);
+    }
+  }
+  
+  // 開始分批初始化
+  // initCardsBatch(); // 移除此行
+  
+  // 建立 THREE.js 基礎元件
+  camera = new THREE.PerspectiveCamera(
+    40,
+    window.innerWidth / window.innerHeight,
+    1,
+    10000
+  );
+  camera.position.z = 3000;
+
+  scene = new THREE.Scene();
+
+  renderer = new THREE.CSS3DRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("container").appendChild(renderer.domElement);
+
+  controls = new THREE.TrackballControls(camera, renderer.domElement);
+  controls.rotateSpeed = 0.5;
+  controls.minDistance = 500;
+  controls.maxDistance = 6000;
+  controls.addEventListener("change", render);
+
+  bindEvent();
+
+  // 根據狀態決定初始畫面 - 暫時註解，等初始化完成後再決定
+  // const showTable = basicData.leftUsers.length === basicData.users.length;
+  // if (showTable) {
+  //   switchScreen("enter");
+  // } else {
+  //   switchScreen("lottery");
+  // }
+
   window.AJAX({
     url: "/getTempData",
     success(data) {
@@ -104,98 +310,10 @@ function initAll() {
     url: "/getUsers",
     success(data) {
       basicData.users = data;
-
-      initCards();
-      // startMaoPao();
-      animate();
-      shineCard();
+      // 開始分批初始化（等用戶資料載入完成後）
+      initCardsBatch();
     }
   });
-}
-
-function initCards() {
-  let member = basicData.users.slice(),
-    showCards = [],
-    length = member.length;
-
-  let isBold = false,
-    showTable = basicData.leftUsers.length === basicData.users.length,
-    index = 0,
-    totalMember = member.length,
-    position = {
-      x: (140 * COLUMN_COUNT - 20) / 2,
-      y: (180 * ROW_COUNT - 20) / 2
-    };
-
-  camera = new THREE.PerspectiveCamera(
-    40,
-    window.innerWidth / window.innerHeight,
-    1,
-    10000
-  );
-  camera.position.z = 3000;
-
-  scene = new THREE.Scene();
-
-  for (let i = 0; i < ROW_COUNT; i++) {
-    for (let j = 0; j < COLUMN_COUNT; j++) {
-      isBold = HIGHLIGHT_CELL.includes(j + "-" + i);
-      var element = createCard(
-        member[index % length],
-        isBold,
-        index,
-        showTable
-      );
-
-      var object = new THREE.CSS3DObject(element);
-      object.position.x = Math.random() * 4000 - 2000;
-      object.position.y = Math.random() * 4000 - 2000;
-      object.position.z = Math.random() * 4000 - 2000;
-      scene.add(object);
-      threeDCards.push(object);
-      //
-
-      var object = new THREE.Object3D();
-      object.position.x = j * 140 - position.x;
-      object.position.y = -(i * 180) + position.y;
-      targets.table.push(object);
-      index++;
-    }
-  }
-
-  // sphere
-
-  var vector = new THREE.Vector3();
-
-  for (var i = 0, l = threeDCards.length; i < l; i++) {
-    var phi = Math.acos(-1 + (2 * i) / l);
-    var theta = Math.sqrt(l * Math.PI) * phi;
-    var object = new THREE.Object3D();
-    object.position.setFromSphericalCoords(800 * Resolution, phi, theta);
-    vector.copy(object.position).multiplyScalar(2);
-    object.lookAt(vector);
-    targets.sphere.push(object);
-  }
-
-  renderer = new THREE.CSS3DRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById("container").appendChild(renderer.domElement);
-
-  //
-
-  controls = new THREE.TrackballControls(camera, renderer.domElement);
-  controls.rotateSpeed = 0.5;
-  controls.minDistance = 500;
-  controls.maxDistance = 6000;
-  controls.addEventListener("change", render);
-
-  bindEvent();
-
-  if (showTable) {
-    switchScreen("enter");
-  } else {
-    switchScreen("lottery");
-  }
 }
 
 function setLotteryStatus(status = false) {
@@ -500,7 +618,7 @@ function transform(targets, duration) {
   }
   animateBatch();
 
-  new TWEEN.Tween(this)
+  new TWEEN.Tween({})
     .to({}, duration * 2)
     .onUpdate(render)
     .start();
@@ -567,7 +685,7 @@ function animate() {
   controls.update();
 
   // 渲染循環
-  // render();
+  render();
 }
 
 // 在 body 加入顯示球體像素半徑的 div（只加一次）
@@ -883,6 +1001,14 @@ function random(num) {
  */
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
+  if (!card) {
+    console.warn('[changeCard] 卡片元素不存在:', cardIndex);
+    return;
+  }
+  if (!user) {
+    console.warn('[changeCard] 用戶資料不存在:', cardIndex);
+    return;
+  }
 
   // 只顯示姓名和部門
   var nameElement = createElement("name", user[1]);
@@ -902,6 +1028,10 @@ function changeCard(cardIndex, user) {
  */
 function shine(cardIndex, color) {
   let card = threeDCards[cardIndex].element;
+  if (!card) {
+    console.warn('[shine] 卡片元素不存在:', cardIndex);
+    return;
+  }
   // 取得主題色 --shine-color，解析 RGB
   let shineColor = getComputedStyle(document.documentElement).getPropertyValue('--shine-color').trim() || 'rgba(0,127,127,0.7)';
   let rgba = shineColor;
@@ -942,6 +1072,7 @@ function shine(cardIndex, color) {
  * 隨機切換背景和人員信息
  */
 function shineCard() {
+  console.log('[shineCard] 開始卡片閃爍動畫');
   let maxCard = 10,
     maxUser;
   let shineCard = 10 + random(maxCard);
