@@ -188,6 +188,15 @@ function showPrizeList(currentPrizeIndex) {
     if (idx < start || idx >= end) {
       cls += " hidden";
     }
+    
+    // 計算實際的剩餘數量
+    let luckyCount = (window.basicData && window.basicData.luckyUsers && window.basicData.luckyUsers[item.type]) ? window.basicData.luckyUsers[item.type].length : 0;
+    let remainingCount = Math.max(item.count - luckyCount, 0);
+    let displayText = item.type === 0 ? "???/???" : `${remainingCount}/${item.count}`;
+    
+    // 計算進度條寬度
+    let progressWidth = item.type === 0 ? "100%" : `${(remainingCount / item.count * 100)}%`;
+    
     htmlCode += `<li id="prize-item-${item.type}" class="${cls}">
                         <span></span><span></span><span></span><span></span>
                         <div class="prize-img">
@@ -197,10 +206,10 @@ function showPrizeList(currentPrizeIndex) {
                             <h5 class="prize-title">${item.text} ${item.title}</h5>
                             <div class="prize-count">
                                 <div class="progress">
-                                    <div id="prize-bar-${item.type}" class="progress-bar progress-bar-danger progress-bar-striped active" style="width: 100%;"></div>
+                                    <div id="prize-bar-${item.type}" class="progress-bar progress-bar-danger progress-bar-striped active" style="width: ${progressWidth};"></div>
                                 </div>
                                 <div id="prize-count-${item.type}" class="prize-count-left">
-                                    ${item.count + "/" + item.count}
+                                    ${displayText}
                                 </div>
                             </div>
                         </div>
@@ -241,7 +250,7 @@ let setPrizeData = (function () {
       type = currentPrize.type,
       elements = prizeElement[type],
       totalCount = currentPrize.count;
-    console.log('[setPrizeData] type:', type, 'count:', totalCount, 'isInit:', isInit);
+    console.log(`[setPrizeData] type: ${type}, count: ${totalCount}, isInit: ${isInit}`);
 
     if (!elements) {
       elements = {
@@ -251,6 +260,8 @@ let setPrizeData = (function () {
       };
       prizeElement[type] = elements;
     }
+    // 新增 DOM 取得狀態 log
+    console.log(`[setPrizeData] DOM: bar=`, elements.bar, 'text=', elements.text);
 
     if (!prizeElement.prizeType) {
       prizeElement.prizeType = document.querySelector("#prizeType");
@@ -313,8 +324,16 @@ let setPrizeData = (function () {
     count = totalCount - count;
     count = count < 0 ? 0 : count;
     let percent = (count / totalCount).toFixed(2);
-    elements.bar && (elements.bar.style.width = percent * 100 + "%");
-    elements.text && (elements.text.textContent = count + "/" + totalCount);
+    // 新增 log
+    console.log(`[setPrizeData] 更新: 剩餘/總數: ${count} / ${totalCount}，百分比: ${percent}`);
+    if (elements.bar) {
+      elements.bar.style.width = percent * 100 + "%";
+      console.log(`[setPrizeData] bar.style.width=`, elements.bar.style.width);
+    }
+    if (elements.text) {
+      elements.text.textContent = count + "/" + totalCount;
+      console.log(`[setPrizeData] text.textContent=`, elements.text.textContent);
+    }
     prizeElement.prizeLeft.textContent = count;
     // quotaBlock 動態刷新
     let quotaBlockEl = document.getElementById('prizeQuotaBlock');
