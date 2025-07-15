@@ -157,7 +157,12 @@ function showPrizeList(currentPrizeIndex) {
   let quotaText = prizeQuotaMap[currentPrize.type];
   let unitText = "個";
   let leftText = currentPrize.type === 0 ? "???" : quotaText;
-  let quotaBlock = showQuota ? `<span id="prizeQuotaBlock">，名額<label class="prize-shine">${quotaText}</label>${unitText}</span>` : "";
+  let quotaBlock = `<span id="prizeQuotaBlock">，名額<label class="prize-shine">${quotaText}</label>${unitText}</span>`;
+  // 只更新 .prize-mess 內容
+  const mess = document.querySelector('.prize-mess');
+  if (mess) {
+    mess.innerHTML = `正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>${quotaBlock}<label id="prizeLeft" style="display:none">${leftText}</label>`;
+  }
   console.log('[showPrizeList] type:', currentPrize.type, 'quotaBlock:', quotaBlock);
   let htmlCode = `<div class="prize-mess">正在抽取<label id="prizeType" class="prize-shine">${currentPrize.text}</label><label id="prizeText" class="prize-shine">${currentPrize.title}</label>${quotaBlock}<label id="prizeLeft" style="display:none">${leftText}</label></div>`;
   htmlCode += `<ul class="prize-list">`;
