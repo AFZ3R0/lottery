@@ -37,58 +37,58 @@ const prizes = [
   {
     type: 4,
     count: 3,
-    text: "四獎",
-    title: "Market Place惠康禮券港幣$1,000",
+    text: "Market Place惠康禮券港幣$1,000",
+    title: "",
     img: "../img/pz04.png"
   },
   {
     type: 5,
     count: 3,
-    text: "五獎",
-    title: "Market Place惠康禮券港幣$1,000",
+    text: "Market Place惠康禮券港幣$1,000",
+    title: "",
     img: "../img/pz05.png"
   },
   {
     type: 6,
     count: 3,
-    text: "五獎",
-    title: "百佳禮券港幣$1,000",
+    text: "百佳禮券港幣$1,000",
+    title: "",
     img: "../img/pz06.png"
   },
   {
     type: 7,
     count: 1,
-    text: "六獎",
-    title: "中銀人壽十二生肖清酒杯套裝",
+    text: "中銀人壽十二生肖清酒杯套裝",
+    title: "",
     img: "../img/pz07.png"
   },
   {
     type: 8,
     count: 2,
-    text: "七獎",
-    title: "金運福船",
+    text: "金運福船",
+    title: "",
     img: "../img/pz08.png"
   },
   {
     type: 9,
     count: 2,
-    text: "八獎",
-    title: "AXA Wine (Domaine de L'Arlot Clos de L'Arlot 2020)",
-    img: "../img/pz09.png"
+    text: "頂級海味珍饌福袋",
+    title: "",
+    img: "../img/pz10.png"
   },
   {
     type: 10,
     count: 2,
-    text: "九獎",
-    title: "頂級海味珍饌福袋",
-    img: "../img/pz10.png"
+    text: "AXA Wine (Domaine de L'Arlot Clos de L'Arlot 2020)",
+    title: "",
+    img: "../img/pz09.png"
   }
 ];
 
 /**
  * 一次抽取的獎品個數與prizes對應
  */
-const EACH_COUNT = [1, 1, 3, 1, 3, 3, 3, 1, 2, 2, 2];
+const EACH_COUNT = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 /**
  * 卡片公司名稱標識
